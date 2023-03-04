@@ -34,6 +34,7 @@ export default {
       app: 'oversea',
       //hostName: 'localhost',
       //ipAddr: '127.0.0.1',
+      instanceId: 'oversea',
       statusPageUrl: 'http://localhost:8082',
       port: {
         $: 8082,
