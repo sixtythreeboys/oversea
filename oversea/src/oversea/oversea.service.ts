@@ -96,8 +96,7 @@ export class OverseaService {
               resolve({
                 status: status,
                 data: {
-                  symb: params.SYMB,
-                  res: res,
+                  dataList: res,
                 },
               });
             }
@@ -154,14 +153,21 @@ export class OverseaService {
                   }
                 })
                 .slice(0, temp) // 초당 횟수 초과 방지
-                .map((e) => {
+                .map((item) => {
                   return this.HHDFS76240000(
                     {
-                      EXCD: e.excd,
-                      SYMB: e.symb,
+                      EXCD: item.excd,
+                      SYMB: item.symb,
+                      name: '-',
                     } as any,
                     datalength,
-                  );
+                  ).then((e) => {
+                    e.data = Object.assign(
+                      { name: item.name, excd: item.excd, symb: item.symb },
+                      e.data,
+                    );
+                    return e;
+                  });
                 }),
             );
           })
@@ -169,7 +175,7 @@ export class OverseaService {
             let res = values
               .map((e) => e.data)
               .filter((e) => {
-                e = e.res.map((e) => parseFloat(e.rate));
+                e = e.dataList.map((e) => parseFloat(e.rate));
                 for (const rate of e) {
                   if (target === 'UP' && rate < 0) {
                     return false;
