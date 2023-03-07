@@ -13,6 +13,10 @@ export default {
         path: '/uapi/overseas-price/v1/quotations/price',
         tr_id: 'HHDFS00000300',
       },
+      해외주식_기간별시세: {
+        path: '/uapi/overseas-price/v1/quotations/dailyprice',
+        tr_id: 'HHDFS76240000',
+      },
       해외주식조건검색: {
         path: '/uapi/overseas-price/v1/quotations/inquire-search',
         tr_id: 'HHDFS76410000',
@@ -57,5 +61,11 @@ export default {
       //   default: 'http://localhost:8761/eureka/', // Replace with your own Eureka server URL
       // },
     },
+  },
+  MYSQL: {
+    host: 'mysql://127.0.0.1:3306/domestic?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true',
+    user: 'root',
+    password: '1q2w3e4r',
+    database: 'mysql',
   },
 };

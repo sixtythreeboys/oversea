@@ -1,5 +1,17 @@
 import config from 'config';
 
+export const markets: Markets[] = [
+  'NYS',
+  'NAS',
+  'AMS',
+  'TSE',
+  'HKS',
+  'SHS',
+  'SZS',
+  'HSX',
+  'HNX',
+];
+
 export type Markets =
   | 'NYS'
   | 'NAS'
@@ -38,6 +50,16 @@ export type HHDFS76410000 = {
   CO_YN_PER?: string;
   CO_ST_PER?: string;
   CO_EN_PER?: string;
+};
+
+export type HHDFS76240000 = {
+  AUTH: '';
+  EXCD: Markets;
+  SYMB: string;
+  GUBN: '0' | '1' | '2';
+  BYMD: string;
+  MODP: '0' | '1';
+  KEYB: string;
 };
 
 export type Header = {
