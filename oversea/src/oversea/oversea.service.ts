@@ -30,7 +30,6 @@ export class OverseaService {
             if (['M'].includes(headers.tr_cont)) {
               HHDFS76410000({
                 tr_id: 'HHDFS76410000',
-                authorization: `${overseaModel.token.token_type} ${overseaModel.token.access_token}`,
                 custtype: 'P',
                 tr_cont: 'N',
               });
@@ -47,7 +46,6 @@ export class OverseaService {
       }
       HHDFS76410000({
         tr_id: 'HHDFS76410000',
-        authorization: `${overseaModel.token.token_type} ${overseaModel.token.access_token}`,
         custtype: 'P',
       });
     });
@@ -88,7 +86,6 @@ export class OverseaService {
             ) {
               HHDFS76240000({
                 tr_id: 'HHDFS76240000',
-                authorization: `${overseaModel.token.token_type} ${overseaModel.token.access_token}`,
                 custtype: 'P',
                 tr_cont: 'N',
               });
@@ -107,7 +104,6 @@ export class OverseaService {
       }
       HHDFS76240000({
         tr_id: 'HHDFS76240000',
-        authorization: `${overseaModel.token.token_type} ${overseaModel.token.access_token}`,
         custtype: 'P',
       });
     });

@@ -1,4 +1,5 @@
 import config from 'config';
+import { overseaModel } from './oversea.model';
 
 export const markets: Markets[] = [
   'NYS',
@@ -83,6 +84,7 @@ export function makeHeader(params?: Header): Header {
     'content-type': 'application/json',
     appkey: config.KIS.appkey,
     appsecret: config.KIS.appsecret,
+    authorization: `${overseaModel.token.token_type} ${overseaModel.token.access_token}`,
   };
   for (const key of Object.keys(params)) {
     res[key] = params[key];
