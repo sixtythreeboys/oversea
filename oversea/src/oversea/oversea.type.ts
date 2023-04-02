@@ -1,18 +1,6 @@
 import config from 'config';
 import { overseaModel } from './oversea.model';
 
-export const markets: Markets[] = [
-  'NYS',
-  'NAS',
-  'AMS',
-  'TSE',
-  'HKS',
-  'SHS',
-  'SZS',
-  'HSX',
-  'HNX',
-];
-
 export type Markets =
   | 'NYS'
   | 'NAS'

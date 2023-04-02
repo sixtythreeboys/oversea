@@ -1,127 +1,38 @@
 import { Injectable } from '@nestjs/common';
-import config from 'config';
-import { HHDFS76410000, HHDFS76240000, makeHeader } from './oversea.type';
-import axios from 'axios';
-import { overseaModel } from './oversea.model';
-import { markets } from './oversea.type';
+import { HHDFS76410000 } from './oversea.type';
+import { Markets } from './oversea.type';
+import { enqueue } from 'src/common/util/delayingQueue';
+import { APIS } from './KISAPIS';
+import { resolve } from 'path';
 
-//let mark = 0;
+export const markets: Markets[] = [
+  'NYS',
+  'NAS',
+  'AMS',
+  'TSE',
+  'HKS',
+  'SHS',
+  'SZS',
+  'HSX',
+  'HNX',
+];
 
 @Injectable()
 export class OverseaService {
   async revokeP() {}
-  async HHDFS76410000(params: HHDFS76410000) {
-    return new Promise(function (resolve, reject) {
-      let res = [];
-      function HHDFS76410000(headers) {
-        axios({
-          method: 'get',
-          url: `${config.KIS.vts}${config.KIS.urls.해외주식조건검색.path}`,
-          headers: makeHeader(headers),
-          params: Object.assign(
-            { AUTH: '', EXCD: 'NAS' } as HHDFS76410000,
-            params,
-          ),
-        })
-          .then((e) => {
-            const { status, headers, data } = e;
-            const { output1, output2, rt_cd, msg_cd, msg1 } = data;
-            res = res.concat(output2);
-            if (['M'].includes(headers.tr_cont)) {
-              HHDFS76410000({
-                tr_id: 'HHDFS76410000',
-                custtype: 'P',
-                tr_cont: 'N',
-              });
-            } else {
-              resolve({
-                status: status,
-                data: res,
-              });
-            }
-          })
-          .catch((e) => {
-            reject(e);
-          });
-      }
-      HHDFS76410000({
-        tr_id: 'HHDFS76410000',
-        custtype: 'P',
-      });
-    });
-  }
-  async HHDFS76240000(params: HHDFS76240000, dateLength: number) {
-    //console.log(mark++);
-    return new Promise(function (resolve, reject) {
-      let res = [];
-      async function HHDFS76240000(headers) {
-        await axios({
-          method: 'get',
-          url: `${config.KIS.vts}${config.KIS.urls.해외주식_기간별시세.path}`,
-          headers: makeHeader(headers),
-          params: Object.assign(
-            {
-              AUTH: '',
-              EXCD: 'NAS',
-              GUBN: '0',
-              BYMD: '',
-              MODP: '1',
-            } as HHDFS76240000,
-            params,
-          ),
-        })
-          .then((e) => {
-            const { status, headers, data } = e;
-            const { output1, output2, rt_cd, msg_cd, msg1 } = data;
-            res = res.concat(
-              dateLength - res.length >= 100
-                ? ['M', 'F'].includes(headers.tr_cont)
-                  ? output2
-                  : output2.filter((e) => Object.values(e)[0] != '')
-                : output2.slice(0, dateLength - res.length),
-            );
-            if (
-              ['M', 'F'].includes(headers.tr_cont) &&
-              res.length !== dateLength
-            ) {
-              HHDFS76240000({
-                tr_id: 'HHDFS76240000',
-                custtype: 'P',
-                tr_cont: 'N',
-              });
-            } else {
-              resolve({
-                status: status,
-                data: {
-                  dataList: res,
-                },
-              });
-            }
-          })
-          .catch((e) => {
-            reject(e);
-          });
-      }
-      HHDFS76240000({
-        tr_id: 'HHDFS76240000',
-        custtype: 'P',
-      });
-    });
-  }
-
-  async getList1(params: HHDFS76410000) {
+  async getList(params: HHDFS76410000) {
     return new Promise(
       function (resolve, reject) {
         Promise.all(
-          markets.map((market) => {
-            return this.HHDFS76410000(
+          ['NAS'].map((market) => {
+            return APIS.HHDFS76410000(
               Object.assign({ EXCD: market } as HHDFS76410000, params),
             );
           }),
         )
           .then((results) => {
             results = results
-              .map(({ ststus, data }: any) => data)
+              .map(({ status, data }: any) => data)
               .reduce((a, c) => a.concat(c));
             resolve({ status: 200, data: results });
           })
@@ -132,62 +43,65 @@ export class OverseaService {
       }.bind(this),
     );
   }
-  async service1_1(datalength: number, target: 'UP' | 'DOWN', temp: number) {
-    return new Promise(
-      function (resolve, reject) {
-        this.getList1({} as any)
-          .then((e) => {
-            return Promise.all(
-              e.data
-                .filter((e) => {
-                  const rate = parseFloat(e.rate);
-                  if (rate === 0.0) return false; //true
-                  else {
-                    if (target === 'UP' && rate > 0) return true;
-                    else if (target === 'DOWN' && rate < 0) return true;
-                    else return false;
-                  }
-                })
-                .slice(0, temp) // 초당 횟수 초과 방지
-                .map((item) => {
-                  return this.HHDFS76240000(
-                    {
-                      EXCD: item.excd,
-                      SYMB: item.symb,
-                      name: '-',
-                    } as any,
-                    datalength,
-                  ).then((e) => {
-                    e.data = Object.assign(
-                      { name: item.name, excd: item.excd, symb: item.symb },
-                      e.data,
-                    );
-                    return e;
-                  });
-                }),
-            );
-          })
-          .then((values) => {
-            let res = values
-              .map((e) => e.data)
-              .filter((e) => {
-                e = e.dataList.map((e) => parseFloat(e.rate));
-                for (const rate of e) {
-                  if (target === 'UP' && rate < 0) {
-                    return false;
-                  } else if (target === 'DOWN' && rate > 0) {
-                    return false;
-                  }
-                }
-                return true;
-              });
-            resolve({ status: 200, data: res });
-          })
-          .catch((e) => {
-            reject(e.response);
-          });
-      }.bind(this),
-    );
+  async service1_1(period: number, gradient: '1' | '-1') {
+    try {
+      const list: any = await this.getList({} as any);
+      const filteredItems = list.data.filter((e) => {
+        const rate = parseFloat(e.rate);
+        if (rate === 0.0) return false; //true
+        else {
+          if (gradient === '1' && rate > 0) return true;
+          else if (gradient === '-1' && rate < 0) return true;
+          else return false;
+        }
+      });
+      const promises = filteredItems.map((item) => {
+        return enqueue(async () => {
+          const response: any = await APIS.HHDFS76240000(
+            {
+              EXCD: item.excd,
+              SYMB: item.symb,
+              name: '-',
+            } as any,
+            period,
+          );
+          response.data = Object.assign(
+            { name: item.name, excd: item.excd, symb: item.symb },
+            response.data,
+          );
+          return response;
+        });
+      });
+      const values = await Promise.all(promises);
+      const res = values
+        .map((e) => e.data)
+        .filter((e) => {
+          e = e.dataList.map((e) => parseFloat(e.rate));
+          for (const rate of e) {
+            if (gradient === '1' && rate < 0) {
+              return false;
+            } else if (gradient === '-1' && rate > 0) {
+              return false;
+            }
+          }
+          return true;
+        })
+        .map((e) => {
+          const last = e.dataList[0];
+          const res = {
+            excd: e.excd,
+            mkscShrnIscd: e.symb,
+            htsKorIsnm: e.name,
+            stckClpr: parseFloat(last.clos),
+            prdyAvlsScal: 'string',
+            prdyCtrt: parseFloat(last.rate),
+            totalCtrt: e.dataList.reduce((a, c) => a + parseFloat(c.rate), 0),
+          };
+          return res;
+        });
+      return { status: 200, data: res };
+    } catch (error) {
+      return { status: 200, data: error };
+    }
   }
-  async service1_2() {}
 }

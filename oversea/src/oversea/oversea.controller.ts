@@ -2,45 +2,31 @@ import { Body, Controller, Get, Query, Post, Res } from '@nestjs/common';
 import { OverseaService } from './oversea.service';
 import { Response } from 'express';
 
+import { enqueue } from 'src/common/util/delayingQueue';
+
 @Controller('oversea')
 export class OverseaController {
   constructor(private readonly oversea: OverseaService) {}
 
   @Get('test')
   async test(@Res() res: Response, @Query() params: any) {
-    this.oversea
-      .getList1(params)
-      .then((e: { status; data }) => {
-        const { status, data } = e;
-        res.status(status).send(data);
-      })
-      .catch((e: { status; data }) => {
-        const { status, data } = e;
-        res.status(status).send(data);
+    console.log('this is test');
+    for (let i = 1; i < 1000; i++) {
+      enqueue(() => {
+        console.log(i);
       });
+    }
+    res.send('test');
   }
 
-  @Get('test2')
-  async test2(@Res() res: Response, @Query() params: any) {
-    this.oversea
-      .HHDFS76240000(
-        {
-          SYMB: 'SE',
-        } as any,
-        105,
-      )
-      .then((e: { status; data }) => console.log(e.data));
-  }
-
-  @Get('service1_1')
-  async service1_1(
+  @Get('list')
+  async list(
     @Res() res: Response,
-    @Query('datelength') datelength: string,
-    @Query('target') target: 'UP' | 'DOWN',
-    @Query('temp') temp: string,
+    @Query('period') period: string,
+    @Query('gradient') gradient: '1' | '-1',
   ) {
     this.oversea
-      .service1_1(parseInt(datelength), target, parseInt(temp))
+      .service1_1(parseInt(period), gradient)
       .then((e: { status; data }) => {
         const { status, data } = e;
         res.status(status).send(data);

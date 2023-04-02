@@ -32,3 +32,5 @@ export async function checkTokenMiddleware(
     await updateToken();
   next();
 }
+
+export async function getFromDb() {}

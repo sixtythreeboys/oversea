@@ -5,6 +5,11 @@ export default {
     PHONE_NUM: '01012345678',
     IP_ADDR: '172.31.35.144',
   },
+  COMMON: {
+    delayingQueue: {
+      bufferSize: 19,
+    },
+  },
   KIS: {
     real: 'https://openapi.koreainvestment.com:9443',
     vts: 'https://openapivts.koreainvestment.com:29443',
@@ -63,7 +68,7 @@ export default {
     },
   },
   MYSQL: {
-    host: 'mysql://127.0.0.1:3306/domestic?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true',
+    host: 'localhost',
     user: 'root',
     password: '1q2w3e4r',
     database: 'mysql',
