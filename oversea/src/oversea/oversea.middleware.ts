@@ -6,7 +6,7 @@ import { NextFunction } from 'express';
 export async function updateToken() {
   const res = await axios({
     method: 'post',
-    url: `${config.KIS.vts}${config.KIS.urls.접근토큰발급.path}`,
+    url: `${config.KIS.real}${config.KIS.urls.접근토큰발급.path}`,
     headers: { 'content-type': 'application/json' },
     data: {
       grant_type: 'client_credentials',

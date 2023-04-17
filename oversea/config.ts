@@ -33,10 +33,19 @@ export default {
         path: '/oauth2/revokeP',
       },
     },
-    appkey: 'PSM3WXIVMo4X2UnaIJCubQl4M9RCNfbm5C6V',
+    appkey: 'PSHuOWS0dNyeHrVldYFAp9Kii96s6racw0QF',
     appsecret:
-      '6J/t0za0MCCNCb74d0+/71iexBomHiT6NQJqx4YZandzS3k5Zb+gzgKdbyludx8xGnTzecmPpjspCteGLnGMVOnOIRpOCBV6Cqax4+xPkpj2rvk4NjNs8YR4PeGWoTb35T+wCnGYgalMOtoj1wcK4WDkg0XXA77jz+rE5qxULJbyA683TV8=',
+      'l+cjOqbMeNYNFCuc6yEuKhGcRLGO0BYFDiljX930/i+AZOaWZksy2Bhsu22RsMsY0TM8ZsabD3nSmX49dvhb2M5PaMiiGB+y8ptGxD/gUVQK4UtkkWcoNePjTj096+KIpubwkOobFlDbkNPcj7+yZFzroaLTs2lbENzA126L4Uyt834McuQ=',
     hashkey: null,
+  },
+  KIS_WS: {
+    real: 'ws://ops.koreainvestment.com:21000',
+    urls: {
+      해외주식_실시간지연체결가: {
+        path: '/tryitout/HDFSCNT0',
+        tr_id: 'HDFSCNT0',
+      },
+    },
   },
   EUREKA: {
     instance: {

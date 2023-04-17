@@ -79,3 +79,16 @@ export function makeHeader(params?: Header): Header {
   }
   return res as Header;
 }
+export function makeWSdata(body: any) {
+  return {
+    header: {
+      approval_key: overseaModel.approval_key,
+      custtype: 'P',
+      tr_type: '1',
+      'content-type': 'utf-8',
+    },
+    body: {
+      input: body,
+    },
+  };
+}
