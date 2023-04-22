@@ -41,10 +41,10 @@ export default {
   EUREKA: {
     instance: {
       app: 'oversea',
-      hostName: 'localhost',
+      hostName: '3.136.15.208',
       ipAddr: '127.0.0.1',
       instanceId: 'oversea',
-      statusPageUrl: 'http://localhost:8082',
+      statusPageUrl: 'http://3.136.15.208:8082',
       port: {
         $: 8082,
         '@enabled': true,
