@@ -42,7 +42,7 @@ export default {
     instance: {
       app: 'oversea',
       hostName: '3.136.15.208',
-      ipAddr: '127.0.0.1',
+      ipAddr: '3.136.15.208',
       instanceId: 'oversea',
       statusPageUrl: 'http://3.136.15.208:8082',
       port: {
