@@ -3,7 +3,7 @@ export default {
     PORT: '8082',
     MAC_ADDRESS: '000000000000',
     PHONE_NUM: '01012345678',
-    IP_ADDR: '172.31.35.144',
+    IP_ADDR: '172.31.36.186',
   },
   COMMON: {
     delayingQueue: {
@@ -63,7 +63,7 @@ export default {
       fetchRegistry: true,
       registerWithEureka: true,
       // serviceUrls: {
-      //   default: 'http://localhost:8761/eureka/', // Replace with your own Eureka server URL
+      //   default: 'http://15.164.171.244:8761/eureka/', // Replace with your own Eureka server URL
       // },
     },
   },
