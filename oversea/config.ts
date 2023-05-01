@@ -33,18 +33,27 @@ export default {
         path: '/oauth2/revokeP',
       },
     },
-    appkey: 'PSM3WXIVMo4X2UnaIJCubQl4M9RCNfbm5C6V',
+    appkey: 'PSHuOWS0dNyeHrVldYFAp9Kii96s6racw0QF',
     appsecret:
-      '6J/t0za0MCCNCb74d0+/71iexBomHiT6NQJqx4YZandzS3k5Zb+gzgKdbyludx8xGnTzecmPpjspCteGLnGMVOnOIRpOCBV6Cqax4+xPkpj2rvk4NjNs8YR4PeGWoTb35T+wCnGYgalMOtoj1wcK4WDkg0XXA77jz+rE5qxULJbyA683TV8=',
+      'l+cjOqbMeNYNFCuc6yEuKhGcRLGO0BYFDiljX930/i+AZOaWZksy2Bhsu22RsMsY0TM8ZsabD3nSmX49dvhb2M5PaMiiGB+y8ptGxD/gUVQK4UtkkWcoNePjTj096+KIpubwkOobFlDbkNPcj7+yZFzroaLTs2lbENzA126L4Uyt834McuQ=',
     hashkey: null,
+  },
+  KIS_WS: {
+    real: 'ws://ops.koreainvestment.com:21000',
+    urls: {
+      해외주식_실시간지연체결가: {
+        path: '/tryitout/HDFSCNT0',
+        tr_id: 'HDFSCNT0',
+      },
+    },
   },
   EUREKA: {
     instance: {
       app: 'oversea',
-      hostName: '3.136.15.208',
-      ipAddr: '3.136.15.208',
+      hostName: 'localhost',
+      ipAddr: '127.0.0.1',
       instanceId: 'oversea',
-      statusPageUrl: 'http://3.136.15.208:8082',
+      statusPageUrl: 'http://localhost:8082',
       port: {
         $: 8082,
         '@enabled': true,
@@ -56,14 +65,14 @@ export default {
       },
     },
     eureka: {
-      host: '15.164.171.244',
+      host: 'localhost',
       port: '8761',
       servicePath: '/eureka/apps',
       //preferIpAddress: true, // This will use the IP address instead of the hostname for registration
       fetchRegistry: true,
       registerWithEureka: true,
       // serviceUrls: {
-      //   default: 'http://15.164.171.244:8761/eureka/', // Replace with your own Eureka server URL
+      //   default: 'http://localhost:8761/eureka/', // Replace with your own Eureka server URL
       // },
     },
   },
