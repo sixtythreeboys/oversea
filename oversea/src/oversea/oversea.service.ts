@@ -48,7 +48,8 @@ export class OverseaService {
       const list: any = await this.getList({} as any);
       const filteredItems = list.data.filter((e) => {
         const rate = parseFloat(e.rate);
-        if (rate === 0.0) return false; //true
+        if (rate === 0.0) return false;
+        //true
         else {
           if (gradient === '1' && rate > 0) return true;
           else if (gradient === '-1' && rate < 0) return true;
@@ -103,5 +104,8 @@ export class OverseaService {
     } catch (error) {
       return { status: 200, data: error };
     }
+  }
+  async getDetail(tr_key: string, period: number) {
+    return { tr_key, period };
   }
 }

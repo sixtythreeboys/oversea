@@ -50,10 +50,10 @@ export default {
   EUREKA: {
     instance: {
       app: 'oversea',
-      hostName: 'localhost',
-      ipAddr: '127.0.0.1',
+      hostName: '3.136.15.208',
+      ipAddr: '3.136.15.208',
       instanceId: 'oversea',
-      statusPageUrl: 'http://localhost:8082',
+      statusPageUrl: 'http://3.136.15.208:8082',
       port: {
         $: 8082,
         '@enabled': true,
@@ -65,14 +65,14 @@ export default {
       },
     },
     eureka: {
-      host: 'localhost',
+      host: '15.164.171.244',
       port: '8761',
       servicePath: '/eureka/apps',
       //preferIpAddress: true, // This will use the IP address instead of the hostname for registration
       fetchRegistry: true,
       registerWithEureka: true,
       // serviceUrls: {
-      //   default: 'http://localhost:8761/eureka/', // Replace with your own Eureka server URL
+      //   default: 'http://15.164.171.244:8761/eureka/', // Replace with your own Eureka server URL
       // },
     },
   },

@@ -8,3 +8,5 @@ export const overseaModel = {
   approval_key: null,
   hashkey: null,
 };
+
+export const client_ws_map = {};
