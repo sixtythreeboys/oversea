@@ -45,10 +45,12 @@ export class OverseaController {
     this.oversea
       .getDetail(tr_key, parseInt(period))
       .then((e) => {
-        res.status(200).send(e);
+        const { status, data } = e;
+        res.status(status).send(data);
       })
       .catch((e) => {
-        res.status(404).send(e);
+        const { status, data } = e;
+        res.status(status).send(data);
       });
   }
 }

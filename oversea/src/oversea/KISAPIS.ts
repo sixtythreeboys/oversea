@@ -1,6 +1,7 @@
 import config from 'config';
 import axios from 'axios';
 import { HHDFS76410000, HHDFS76240000, makeHeader } from './oversea.type';
+import { enqueue } from 'src/common/util/delayingQueue';
 
 export const APIS = {
   async oauth2Approval() {
@@ -116,3 +117,15 @@ export const APIS = {
     });
   },
 };
+
+for (const key of Object.keys(APIS).filter(
+  (key) => typeof APIS[key] === 'function',
+)) {
+  APIS[key] = new Proxy(APIS[key], {
+    apply: function (target, thisArg, argumentsList) {
+      return enqueue(async function () {
+        return target(...argumentsList);
+      });
+    },
+  });
+}

@@ -8,6 +8,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
+import { HDFSCNT0 as HDFSCNT0_map } from './oversea.model';
 
 @WebSocketGateway({
   cors: {
@@ -27,10 +28,11 @@ export class OverseaGateway
     console.log('Client connected' + client);
   }
   handleDisconnect(client: any) {
+    HDFSCNT0_map.deleteClient(client);
     console.log('Client disconnected' + client);
   }
   @SubscribeMessage('watch')
-  watch(@MessageBody() data: any) {
+  watch(@MessageBody() tr_key: any) {
     return { test: 'test' };
   }
 }
