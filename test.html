@@ -28,6 +28,12 @@
 			socket.on("disconnect", function () {
 				console.log("Socket.IO connection closed!");
 			});
+			socket.on("HDFSCNT0", function (data) {
+				console.log("HDFSCNT0" + JSON.stringify(data, undefined, 2));
+			});
+			socket.emit("HDFSCNT0", {
+				tr_key: "DNASAAPL",
+			});
 		</script>
 	</body>
 </html>

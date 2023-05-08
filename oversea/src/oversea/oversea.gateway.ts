@@ -1,4 +1,5 @@
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -7,7 +8,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { HDFSCNT0 as HDFSCNT0_map } from './oversea.model';
 
 @WebSocketGateway({
@@ -24,15 +25,19 @@ export class OverseaGateway
   afterInit(server: any) {
     console.log('oversea WS inited');
   }
-  handleConnection(client: any, ...args: any[]) {
+  handleConnection(client: Socket, ...args: any[]) {
     console.log('Client connected' + client);
   }
-  handleDisconnect(client: any) {
+  handleDisconnect(client: Socket) {
     HDFSCNT0_map.deleteClient(client);
     console.log('Client disconnected' + client);
   }
-  @SubscribeMessage('watch')
-  watch(@MessageBody() tr_key: any) {
-    return { test: 'test' };
+  @SubscribeMessage('HDFSCNT0')
+  HDFSCNT0(
+    @ConnectedSocket() client: Socket,
+    @MessageBody('tr_key') tr_key: any,
+  ) {
+    HDFSCNT0_map.add(client, tr_key);
+    console.log('ws : HDFSCNT0 = ' + tr_key);
   }
 }

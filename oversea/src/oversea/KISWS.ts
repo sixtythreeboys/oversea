@@ -21,7 +21,7 @@ export const KISclients: {
     HDFSCNT0: {
       sendAll() {
         for (const target of HDFSCNT0_map.target_clients.keys()) {
-          this.socket.send(
+          KISclients.socket.send(
             JSON.stringify(
               makeWSdata({
                 tr_id: config.KIS_WS.urls.해외주식_실시간지연체결가.tr_id,
@@ -32,7 +32,7 @@ export const KISclients: {
         }
       },
       send(target: string) {
-        this.socket.send(
+        KISclients.socket.send(
           JSON.stringify(
             makeWSdata({
               tr_id: config.KIS_WS.urls.해외주식_실시간지연체결가.tr_id,
@@ -41,8 +41,9 @@ export const KISclients: {
           ),
         );
       },
-      handle(e) {
-        console.log('HDFSCNT0 : ' + e);
+      handle({ header, body }) {
+        HDFSCNT0_map.sendData(body.실시간종목코드, body);
+        //console.log('HDFSCNT0 : ' + JSON.stringify(body, undefined, 2));
       },
     },
   },
@@ -59,7 +60,9 @@ const handlers = {
   message(e) {
     const { header, body } = parseWSmessage(e.toString('utf8'));
     try {
-      KISclients.messageHandlers[header.tr_id].handle(e);
+      KISclients.messageHandlers[header.tr_id].handle(
+        parseWSmessage(e.toString('utf8')),
+      );
     } catch (err) {
       console.log('fail to handle KIS ws message : ' + err);
     }
@@ -77,7 +80,6 @@ export async function init() {
     for (let [event, func] of Object.entries(handlers)) {
       KISclients.socket.on(event, func);
     }
-    //clients.messageHandlers.HDFSCNT0.add('DNASAAPL');
   } catch (error) {
     console.log(error);
     return error;
