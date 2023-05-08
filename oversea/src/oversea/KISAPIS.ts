@@ -1,15 +1,31 @@
 import config from 'config';
 import axios from 'axios';
 import { HHDFS76410000, HHDFS76240000, makeHeader } from './oversea.type';
+import { enqueue } from 'src/common/util/delayingQueue';
 
 export const APIS = {
+  async oauth2Approval() {
+    return axios.post(
+      `${config.KIS.real}/oauth2/Approval`,
+      {
+        grant_type: 'client_credentials',
+        appkey: config.KIS.appkey,
+        secretkey: config.KIS.appsecret,
+      },
+      {
+        headers: {
+          'content-type': 'application/json',
+        },
+      },
+    );
+  },
   async HHDFS76410000(params: HHDFS76410000) {
     return new Promise(function (resolve, reject) {
       let res = [];
       function HHDFS76410000(headers) {
         axios({
           method: 'get',
-          url: `${config.KIS.vts}${config.KIS.urls.해외주식조건검색.path}`,
+          url: `${config.KIS.real}${config.KIS.urls.해외주식조건검색.path}`,
           headers: makeHeader(headers),
           params: Object.assign(
             { AUTH: '', EXCD: 'NAS' } as HHDFS76410000,
@@ -52,7 +68,7 @@ export const APIS = {
       async function HHDFS76240000(headers) {
         await axios({
           method: 'get',
-          url: `${config.KIS.vts}${config.KIS.urls.해외주식_기간별시세.path}`,
+          url: `${config.KIS.real}${config.KIS.urls.해외주식_기간별시세.path}`,
           headers: makeHeader(headers),
           params: Object.assign(
             {
@@ -101,3 +117,15 @@ export const APIS = {
     });
   },
 };
+
+for (const key of Object.keys(APIS).filter(
+  (key) => typeof APIS[key] === 'function',
+)) {
+  APIS[key] = new Proxy(APIS[key], {
+    apply: function (target, thisArg, argumentsList) {
+      return enqueue(async function () {
+        return target(...argumentsList);
+      });
+    },
+  });
+}

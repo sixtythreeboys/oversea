@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { HHDFS76410000 } from './oversea.type';
 import { Markets } from './oversea.type';
-import { enqueue } from 'src/common/util/delayingQueue';
 import { APIS } from './KISAPIS';
-import { resolve } from 'path';
 
 export const markets: Markets[] = [
   'NYS',
@@ -48,29 +46,28 @@ export class OverseaService {
       const list: any = await this.getList({} as any);
       const filteredItems = list.data.filter((e) => {
         const rate = parseFloat(e.rate);
-        if (rate === 0.0) return false; //true
+        if (rate === 0.0) return false;
+        //true
         else {
           if (gradient === '1' && rate > 0) return true;
           else if (gradient === '-1' && rate < 0) return true;
           else return false;
         }
       });
-      const promises = filteredItems.map((item) => {
-        return enqueue(async () => {
-          const response: any = await APIS.HHDFS76240000(
-            {
-              EXCD: item.excd,
-              SYMB: item.symb,
-              name: '-',
-            } as any,
-            period,
-          );
-          response.data = Object.assign(
-            { name: item.name, excd: item.excd, symb: item.symb },
-            response.data,
-          );
-          return response;
-        });
+      const promises = filteredItems.map(async (item) => {
+        const response: any = await APIS.HHDFS76240000(
+          {
+            EXCD: item.excd,
+            SYMB: item.symb,
+            name: '-',
+          } as any,
+          period,
+        );
+        response.data = Object.assign(
+          { name: item.name, excd: item.excd, symb: item.symb },
+          response.data,
+        );
+        return response;
       });
       const values = await Promise.all(promises);
       const res = values
@@ -103,5 +100,18 @@ export class OverseaService {
     } catch (error) {
       return { status: 200, data: error };
     }
+  }
+  async getDetail(tr_key: string, period: number) {
+    const [EXCD, SYMB] = tr_key.split('|');
+    const dataList = await APIS.HHDFS76240000(
+      {
+        EXCD: EXCD,
+        SYMB: SYMB,
+        name: '-',
+      } as any,
+      period,
+    );
+    const { status, data } = dataList as any;
+    return { status, data: data.dataList };
   }
 }

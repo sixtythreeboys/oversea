@@ -36,4 +36,21 @@ export class OverseaController {
         res.status(status).send(data);
       });
   }
+  @Get('detail')
+  async detail(
+    @Res() res: Response,
+    @Query('tr_key') tr_key: string,
+    @Query('period') period: string,
+  ) {
+    this.oversea
+      .getDetail(tr_key, parseInt(period))
+      .then((e) => {
+        const { status, data } = e;
+        res.status(status).send(data);
+      })
+      .catch((e) => {
+        const { status, data } = e;
+        res.status(status).send(data);
+      });
+  }
 }
