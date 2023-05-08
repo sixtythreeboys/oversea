@@ -15,7 +15,7 @@ export const KISclients: {
   messageHandlers: {
     PINGPONG: {
       handle(e) {
-        console.log('PINGPONG : ' + e);
+        //console.log('PINGPONG : ' + e);
       },
     },
     HDFSCNT0: {
