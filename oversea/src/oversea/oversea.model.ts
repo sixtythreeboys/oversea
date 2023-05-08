@@ -1,4 +1,5 @@
 import { KISclients } from './KISWS';
+import { Socket } from 'socket.io';
 
 export const overseaModel = {
   token: {
@@ -14,7 +15,7 @@ export const overseaModel = {
 export const HDFSCNT0 = {
   target_clients: new Map<string, Set<any>>(),
   client_targets: new Map<any, Set<string>>(),
-  add(client: any, target: string) {
+  add(client: Socket, target: string) {
     if (!this.target_clients.has(target)) {
       this.target_clients.set(target, new Set<any>());
     }
@@ -27,7 +28,7 @@ export const HDFSCNT0 = {
     targets.add(target);
     KISclients.messageHandlers.HDFSCNT0.send(target);
   },
-  delete(client: any, target: string) {
+  delete(client: Socket, target: string) {
     const clients = this.target_clients.get(target);
     const targets = this.client_targets.get(client);
     clients.delete(client);
@@ -39,9 +40,20 @@ export const HDFSCNT0 = {
       this.client_targets.delete(client);
     }
   },
-  deleteClient(client: any) {
-    for (const target of this.client_targets.get(client)) {
+  deleteClient(client: Socket) {
+    const targets = this.client_targets.get(client)
+      ? this.client_targets.get(client)
+      : [];
+    for (const target of targets) {
       this.delete(client, target);
+    }
+  },
+  sendData(target: string, data: any) {
+    const clients = this.target_clients.get(target)
+      ? this.target_clients.get(target)
+      : [];
+    for (const client of clients) {
+      client.emit('HDFSCNT0', data);
     }
   },
 };
