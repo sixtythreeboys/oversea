@@ -53,7 +53,7 @@ export default {
       hostName: '3.136.15.208',
       ipAddr: '3.136.15.208',
       instanceId: 'oversea',
-      statusPageUrl: 'http://3.136.15.208:8082',
+      statusPageUrl: 'http://3.136.15.208:8082/test',
       port: {
         $: 8082,
         '@enabled': true,
