@@ -2,15 +2,27 @@ import { Injectable } from '@nestjs/common';
 import { HHDFS76410000 } from './oversea.type';
 import { Markets } from './oversea.type';
 import { APIS } from './KISAPIS';
-import { DBService } from 'src/DB/DB.service';
 
-export const markets: Markets[] = ['NAS'];
-const _unused = {
+export const markets: Markets[] = [
+  'NYS',
+  'NAS',
+  'AMS',
+  'TSE',
+  'HKS',
+  'SHS',
+  'SZS',
+  'HSX',
+  'HNX',
+];
+
+@Injectable()
+export class OverseaService {
+  async revokeP() {}
   async getList(params: HHDFS76410000) {
     return new Promise(
       function (resolve, reject) {
         Promise.all(
-          markets.map((market) => {
+          ['NAS'].map((market) => {
             return APIS.HHDFS76410000(
               Object.assign({ EXCD: market } as HHDFS76410000, params),
             );
@@ -28,15 +40,11 @@ const _unused = {
           });
       }.bind(this),
     );
-  },
-};
-@Injectable()
-export class OverseaService {
-  constructor(private readonly dbService: DBService) {}
-  async revokeP() {}
-  async filter1(list: any, period: number, gradient: '1' | '-1') {
+  }
+  async service1_1(period: number, gradient: '1' | '-1') {
     try {
-      const filteredItems = list.filter((e) => {
+      const list: any = await this.getList({} as any);
+      const filteredItems = list.data.filter((e) => {
         const rate = parseFloat(e.rate);
         if (rate === 0.0) return false;
         //true
@@ -93,23 +101,17 @@ export class OverseaService {
       return { status: 200, data: error };
     }
   }
-  async getDetail(시장코드, 종목코드, 기간분류코드, period) {
-    const [EXCD, SYMB] = [시장코드 ? 시장코드 : 'NAS', 종목코드];
+  async getDetail(tr_key: string, period: number) {
+    const [EXCD, SYMB] = tr_key.split('|');
     const dataList = await APIS.HHDFS76240000(
       {
         EXCD: EXCD,
         SYMB: SYMB,
-        GUBN: {
-          D: '0',
-        }[기간분류코드.toUpperCase()],
         name: '-',
       } as any,
-      period ? period : 1,
+      period,
     );
     const { status, data } = dataList as any;
     return { status, data: data.dataList };
-  }
-  async getList() {
-    return this.dbService.getList();
   }
 }
