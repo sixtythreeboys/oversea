@@ -101,15 +101,18 @@ export class OverseaService {
       return { status: 200, data: error };
     }
   }
-  async getDetail(tr_key: string, period: number) {
-    const [EXCD, SYMB] = tr_key.split('|');
+  async getDetail(시장코드, 종목코드, 기간분류코드, period) {
+    const [EXCD, SYMB] = [시장코드 ? 시장코드 : 'NAS', 종목코드];
     const dataList = await APIS.HHDFS76240000(
       {
         EXCD: EXCD,
         SYMB: SYMB,
+        GUBN: {
+          D: '0',
+        }[기간분류코드.toUpperCase()],
         name: '-',
       } as any,
-      period,
+      period ? period : 1,
     );
     const { status, data } = dataList as any;
     return { status, data: data.dataList };

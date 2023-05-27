@@ -39,11 +39,13 @@ export class OverseaController {
   @Get('detail')
   async detail(
     @Res() res: Response,
-    @Query('tr_key') tr_key: string,
+    @Query('시장코드') 시장코드: string,
+    @Query('종목코드') 종목코드: string,
+    @Query('기간분류코드') 기간분류코드: string,
     @Query('period') period: string,
   ) {
     this.oversea
-      .getDetail(tr_key, parseInt(period))
+      .getDetail(시장코드, 종목코드, 기간분류코드, parseInt(period))
       .then((e) => {
         const { status, data } = e;
         res.status(status).send(data);
