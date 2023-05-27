@@ -1,18 +1,8 @@
+import { resolve } from 'path';
 import { dbModel } from './DB.model';
+import { readFileSync } from 'fs';
 
-export async function init() {
-  // await dbModel.connection.connect((error) => {
-  //   if (error) {
-  //     console.error('Error connecting to MySQL database: ' + error.stack);
-  //     return;
-  //   }
-  //   console.log(
-  //     'Connected to MySQL database with connection ID ' +
-  //       dbModel.connection.threadId,
-  //   );
-  // });
-  // return;
-}
+let codeList = null;
 
 export class DBService {
   exe(query: string) {
@@ -24,5 +14,16 @@ export class DBService {
         resolve({ results, fields });
       });
     });
+  }
+  async getList() {
+    if (codeList === null) {
+      codeList = readFileSync(
+        resolve(__dirname + '/../../../data/code'),
+        'utf8',
+      )
+        .split('\n')
+        .map((e) => e.split('\t'));
+    }
+    return codeList;
   }
 }

@@ -2,27 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { HHDFS76410000 } from './oversea.type';
 import { Markets } from './oversea.type';
 import { APIS } from './KISAPIS';
+import { DBService } from 'src/DB/DB.service';
 
-export const markets: Markets[] = [
-  'NYS',
-  'NAS',
-  'AMS',
-  'TSE',
-  'HKS',
-  'SHS',
-  'SZS',
-  'HSX',
-  'HNX',
-];
-
-@Injectable()
-export class OverseaService {
-  async revokeP() {}
+export const markets: Markets[] = ['NAS'];
+const _unused = {
   async getList(params: HHDFS76410000) {
     return new Promise(
       function (resolve, reject) {
         Promise.all(
-          ['NAS'].map((market) => {
+          markets.map((market) => {
             return APIS.HHDFS76410000(
               Object.assign({ EXCD: market } as HHDFS76410000, params),
             );
@@ -40,11 +28,15 @@ export class OverseaService {
           });
       }.bind(this),
     );
-  }
-  async service1_1(period: number, gradient: '1' | '-1') {
+  },
+};
+@Injectable()
+export class OverseaService {
+  constructor(private readonly dbService: DBService) {}
+  async revokeP() {}
+  async filter1(list: any, period: number, gradient: '1' | '-1') {
     try {
-      const list: any = await this.getList({} as any);
-      const filteredItems = list.data.filter((e) => {
+      const filteredItems = list.filter((e) => {
         const rate = parseFloat(e.rate);
         if (rate === 0.0) return false;
         //true
@@ -116,5 +108,8 @@ export class OverseaService {
     );
     const { status, data } = dataList as any;
     return { status, data: data.dataList };
+  }
+  async getList() {
+    return this.dbService.getList();
   }
 }

@@ -1,3 +1,6 @@
+import * as fs from 'fs';
+import { resolve } from 'path';
+
 export default {
   APP: {
     PORT: '8082',
@@ -79,7 +82,15 @@ export default {
   MYSQL: {
     host: 'localhost',
     user: 'root',
+    port: 3306,
     password: '1q2w3e4r',
-    database: 'mysql',
+    database: 'oversea',
+  },
+  SSH: {
+    host: 'ec2-15-164-171-244.ap-northeast-2.compute.amazonaws.com',
+    username: 'ubuntu',
+    privateKey: fs.readFileSync(
+      resolve(__dirname, '../data/pem/sixtythree.pem'),
+    ),
   },
 };
