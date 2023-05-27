@@ -1,3 +1,6 @@
+import * as fs from 'fs';
+import { resolve } from 'path';
+
 export default {
   APP: {
     PORT: '8082',
@@ -53,7 +56,7 @@ export default {
       hostName: '3.136.15.208',
       ipAddr: '3.136.15.208',
       instanceId: 'oversea',
-      statusPageUrl: 'http://3.136.15.208:8082/test',
+      statusPageUrl: 'http://3.136.15.208:8082/oversea/test',
       port: {
         $: 8082,
         '@enabled': true,
@@ -79,7 +82,15 @@ export default {
   MYSQL: {
     host: 'localhost',
     user: 'root',
+    port: 3306,
     password: '1q2w3e4r',
-    database: 'mysql',
+    database: 'oversea',
+  },
+  SSH: {
+    host: 'ec2-15-164-171-244.ap-northeast-2.compute.amazonaws.com',
+    username: 'ubuntu',
+    privateKey: fs.readFileSync(
+      resolve(__dirname, '../data/pem/sixtythree.pem'),
+    ),
   },
 };
