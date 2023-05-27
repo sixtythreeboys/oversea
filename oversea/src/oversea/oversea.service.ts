@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { HHDFS76410000 } from './oversea.type';
 import { Markets } from './oversea.type';
-import { APIS } from './KISAPIS';
+import { APIS } from '../KIS/KISAPIS';
 
 export const markets: Markets[] = [
   'NYS',

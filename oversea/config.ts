@@ -77,7 +77,7 @@ export default {
     },
   },
   MYSQL: {
-    host: 'localhost',
+    host: '15.164.171.244',
     user: 'root',
     password: '1q2w3e4r',
     database: 'mysql',

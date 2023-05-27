@@ -1,4 +1,4 @@
-import { KISclients } from './KISWS';
+import { KISclients } from '../KIS/KISWS';
 import { Socket } from 'socket.io';
 
 export const overseaModel = {

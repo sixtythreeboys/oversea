@@ -2,9 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { apply as eureka } from './common/eureka';
 import config from 'config';
-
 import { init as DBinit } from 'src/DB/DB.service';
-import { init as KISWSinit } from 'src/oversea/KISWS';
+import { init as KISWSinit } from 'src/KIS/KISWS';
 
 async function init() {
   try {

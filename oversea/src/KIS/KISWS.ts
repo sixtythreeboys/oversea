@@ -1,10 +1,10 @@
 import config from 'config';
 import { APIS } from './KISAPIS';
-import { overseaModel } from './oversea.model';
-import { makeWSdata } from './oversea.type';
+import { overseaModel } from '../oversea/oversea.model';
+import { makeWSdata } from '../oversea/oversea.type';
 import { WebSocket } from 'ws';
 import { parseWSmessage } from './KISWSparsing';
-import { HDFSCNT0 as HDFSCNT0_map } from './oversea.model';
+import { HDFSCNT0 as HDFSCNT0_map } from '../oversea/oversea.model';
 
 const CONFIG = config.KIS_WS;
 

@@ -1,6 +1,10 @@
 import config from 'config';
 import axios from 'axios';
-import { HHDFS76410000, HHDFS76240000, makeHeader } from './oversea.type';
+import {
+  HHDFS76410000,
+  HHDFS76240000,
+  makeHeader,
+} from '../oversea/oversea.type';
 import { enqueue } from 'src/common/util/delayingQueue';
 
 export const APIS = {
