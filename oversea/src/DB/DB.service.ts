@@ -1,17 +1,17 @@
 import { dbModel } from './DB.model';
 
 export async function init() {
-  // await dbModel.connection.connect((error) => {
-  //   if (error) {
-  //     console.error('Error connecting to MySQL database: ' + error.stack);
-  //     return;
-  //   }
-  //   console.log(
-  //     'Connected to MySQL database with connection ID ' +
-  //       dbModel.connection.threadId,
-  //   );
-  // });
-  // return;
+  await dbModel.connection.connect((error) => {
+    if (error) {
+      console.error('Error connecting to MySQL database: ' + error.stack);
+      return;
+    }
+    console.log(
+      'Connected to MySQL database with connection ID ' +
+        dbModel.connection.threadId,
+    );
+  });
+  return;
 }
 
 export class DBService {
