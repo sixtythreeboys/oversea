@@ -17,17 +17,18 @@ export class BatchService {
     // Access and use the MyService within the initialization logic
     await updateToken();
     // this.job = new CronJob('0 0 1 * * *', async () => {
-    //   this.updateUpDown();
-    // });
-    this.job = new CronJob('*/10 * * * * *', async () => {
+    this.job = new CronJob('*/5 * * * * *', async () => {
       this.updateUpDown();
     });
     this.job.start();
   }
   async updateUpDown() {
-    const res = await exeQuery(
+    const res:[] = await exeQuery(
       `select distinct excd, symb from OVERSEA_ITEM_MAST;`,
-    );
-    console.log(res);
+    ) as [];
+    for (const {excd, symb} of res){
+      console.log(excd, symb);
+      //this.oversea.getDetail();
+    }
   }
 }
