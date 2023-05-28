@@ -45,7 +45,7 @@ export class OverseaController {
     this.oversea
       .getDetail(tr_key, parseInt(period))
       .then((e) => {
-        const { status, data } = e;
+        const { status, data } = e as any;
         res.status(status).send(data);
       })
       .catch((e) => {

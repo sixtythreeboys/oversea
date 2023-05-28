@@ -14,15 +14,13 @@ export async function init() {
   return;
 }
 
-export class DBService {
-  exe(query: string) {
-    return new Promise((resolve, reject) => {
-      dbModel.connection.query(query, (error, results, fields) => {
-        if (error) {
-          reject(error);
-        }
-        resolve({ results, fields });
-      });
+export async function exeQuery(query: string) {
+  return new Promise((resolve, reject) => {
+    dbModel.connection.query(query, (error, results, fields) => {
+      if (error) {
+        reject(error);
+      }
+      resolve({ results, fields });
     });
-  }
+  });
 }
