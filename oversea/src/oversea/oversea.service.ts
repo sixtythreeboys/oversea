@@ -102,7 +102,7 @@ export class OverseaService {
     }
   }
   async getDetail(tr_key: string, period: number) {
-    const [EXCD, SYMB] = tr_key.split('|');
+    const [EXCD, SYMB] = ['NAS',tr_key];
     const dataList = await APIS.HHDFS76240000(
       {
         EXCD: EXCD,

@@ -8,13 +8,11 @@ import { init as KISWSinit } from 'src/KIS/KISWS';
 async function init() {
   try {
     await DBinit();
-    console.log('DB connected');
   } catch (e) {
     console.log('DB connect failed');
   }
   try {
     await KISWSinit();
-    console.log('KISWS connected');
   } catch (e) {
     console.log('KISWS connect failed');
   }
