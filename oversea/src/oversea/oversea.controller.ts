@@ -23,10 +23,10 @@ export class OverseaController {
   async list(
     @Res() res: Response,
     @Query('period') period: string,
-    @Query('gradient') gradient: '1' | '-1',
+    @Query('avlsScal') avlsScal: string,
   ) {
     this.oversea
-      .service1_1(parseInt(period), gradient)
+      .list1_1(parseInt(period), parseInt(avlsScal))
       .then((e: { status; data }) => {
         const { status, data } = e;
         res.status(status).send(data);
@@ -39,18 +39,44 @@ export class OverseaController {
   @Get('detail')
   async detail(
     @Res() res: Response,
-    @Query('tr_key') tr_key: string,
-    @Query('period') period: string,
+    @Query('EXCD') EXCD: string,
+    @Query('종목코드') 종목코드: string,
+    @Query('기간분류코드') 기간분류코드: string,
+    @Query('period') period: string | number,
   ) {
-    this.oversea
-      .getDetail(tr_key, parseInt(period))
-      .then((e) => {
-        const { status, data } = e as any;
-        res.status(status).send(data);
-      })
-      .catch((e) => {
-        const { status, data } = e;
-        res.status(status).send(data);
-      });
+    function checkInputValidation(): boolean {
+      EXCD = EXCD ? EXCD : 'NAS';
+      if ([종목코드].includes(undefined)) {
+        return false;
+      }
+      기간분류코드 = 기간분류코드 ? 기간분류코드.toUpperCase() : 'D';
+      if (!['D', 'W', 'M'].includes(기간분류코드)) {
+        return false;
+      }
+      period = period ? parseInt(period as string) : 30;
+      if (Number.isNaN(period)) {
+        return false;
+      }
+      return true;
+    }
+    if (checkInputValidation()) {
+      this.oversea
+        .getDetail({
+          EXCD,
+          종목코드,
+          기간분류코드,
+          period,
+        })
+        .then((e) => {
+          const { status, data } = e as any;
+          res.status(status).send(data);
+        })
+        .catch((e) => {
+          const { status, data } = e;
+          res.status(status).send(data);
+        });
+    } else {
+      res.status(500).send({ err: '잘못된 인자' });
+    }
   }
 }

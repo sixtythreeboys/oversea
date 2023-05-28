@@ -41,7 +41,7 @@ export class OverseaService {
       }.bind(this),
     );
   }
-  async service1_1(period: number, gradient: '1' | '-1') {
+  async list1_1(period: number, avlsScal: number) {
     try {
       const list: any = await this.getList({} as any);
       const filteredItems = list.data.filter((e) => {
@@ -49,8 +49,8 @@ export class OverseaService {
         if (rate === 0.0) return false;
         //true
         else {
-          if (gradient === '1' && rate > 0) return true;
-          else if (gradient === '-1' && rate < 0) return true;
+          if (period > 0 && rate > 0) return true;
+          else if (period < 0 && rate < 0) return true;
           else return false;
         }
       });
@@ -75,9 +75,9 @@ export class OverseaService {
         .filter((e) => {
           e = e.dataList.map((e) => parseFloat(e.rate));
           for (const rate of e) {
-            if (gradient === '1' && rate < 0) {
+            if (period > 0 && rate < 0) {
               return false;
-            } else if (gradient === '-1' && rate > 0) {
+            } else if (period < 0 && rate > 0) {
               return false;
             }
           }
@@ -101,16 +101,58 @@ export class OverseaService {
       return { status: 200, data: error };
     }
   }
-  async getDetail(tr_key: string, period: number) {
-    const [EXCD, SYMB] = ['NAS', tr_key];
-    const dataList = await APIS.HHDFS76240000(
+  async getDetail({ EXCD, 종목코드, 기간분류코드, period }) {
+    const dataHHDFS76240000 = await APIS.HHDFS76240000(
       {
         EXCD: EXCD,
-        SYMB: SYMB,
+        SYMB: 종목코드,
+        GUBN: {
+          D: '0',
+          W: '1',
+          M: '2',
+        }[기간분류코드],
         name: '-',
       } as any,
       period,
     );
-    return dataList;
+    const { status, data } = dataHHDFS76240000 as { status; data };
+    return {
+      status,
+      data: data.dataList.map(
+        ({
+          xymd,
+          clos,
+          sign,
+          diff,
+          rate,
+          open,
+          high,
+          low,
+          tvol,
+          tamt,
+          pbid,
+          vbid,
+          pask,
+          vask,
+        }) => {
+          return {
+            stckBsopDate: xymd,
+            stckClpr: clos,
+            prdyVrssSign: sign,
+            prdyVrss: diff,
+            rate,
+            stckOprc: open,
+            stckHgpr: high,
+            stckLwpr: low,
+            acmlVol: tvol,
+            acmlTrPbmn: tamt,
+            pbid,
+            vbid,
+            pask,
+            vask,
+          };
+        },
+      ),
+    };
   }
 }
