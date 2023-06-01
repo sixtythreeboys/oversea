@@ -20,7 +20,6 @@ export async function exeQuery(query: string) {
       if (error) {
         reject(error);
       }
-      console.log(results);
       resolve(results);
     });
   });

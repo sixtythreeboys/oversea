@@ -88,6 +88,12 @@ export const APIS = {
           .then((e) => {
             const { status, headers, data } = e;
             const { output1, output2, rt_cd, msg_cd, msg1 } = data;
+            if (output2[0].rate === '') {
+              resolve({
+                status: 500,
+                data: { msg: '유효하지않은 종목코드' },
+              });
+            }
             res = res.concat(
               period - res.length >= 100
                 ? ['M', 'F'].includes(headers.tr_cont)

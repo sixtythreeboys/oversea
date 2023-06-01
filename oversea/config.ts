@@ -7,7 +7,7 @@ export default {
   },
   COMMON: {
     delayingQueue: {
-      bufferSize: 19,
+      bufferSize: 17,
     },
   },
   KIS: {

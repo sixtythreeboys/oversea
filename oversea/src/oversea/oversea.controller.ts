@@ -36,7 +36,7 @@ export class OverseaController {
         res.status(status).send(data);
       });
   }
-  @Get('detail')
+  @Get('price-by-period')
   async detail(
     @Res() res: Response,
     @Query('EXCD') EXCD: string,
