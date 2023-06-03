@@ -31,7 +31,7 @@ export class OverseaService {
       data: results,
     };
   }
-  async list1_1(period: number, avlsScal: number) {
+  async list_v1(period: number, avlsScal: number) {
     try {
       const list: any = await this.getList({} as any);
       const filteredItems = list.data.filter((e) => {
@@ -91,7 +91,9 @@ export class OverseaService {
       return { status: 200, data: error };
     }
   }
-  async getDetail({ EXCD, 종목코드, 기간분류코드, period }) {
+  async list_v2(period: number, avlsScal: number) {}
+
+  async getDetail_v1({ EXCD, 종목코드, 기간분류코드, period }) {
     const datas = await APIS.HHDFS76240000(
       {
         EXCD: EXCD,
@@ -144,4 +146,5 @@ export class OverseaService {
       ),
     };
   }
+  async getDetail_v2({ EXCD, 종목코드, 기간분류코드, period }) {}
 }

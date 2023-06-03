@@ -32,7 +32,7 @@ export class OverseaController {
     @Query('avlsScal') avlsScal: string,
   ) {
     this.oversea
-      .list1_1(parseInt(period), parseInt(avlsScal))
+      .list_v1(parseInt(period), parseInt(avlsScal))
       .then((e: { status; data }) => {
         const { status, data } = e;
         res.status(status).send(data);
@@ -42,6 +42,16 @@ export class OverseaController {
         res.status(status).send(data);
       });
   }
+
+  @Get('list2')
+  async list2(
+    @Res() res: Response,
+    @Query('period') period: string,
+    @Query('avlsScal') avlsScal: string,
+  ) {
+    this.oversea.list_v2(parseInt(period), parseInt(avlsScal));
+  }
+
   @Get('price-by-period')
   async detail(
     @Res() res: Response,
@@ -69,7 +79,7 @@ export class OverseaController {
     }
     if (checkInputValidation()) {
       this.oversea
-        .getDetail({
+        .getDetail_v1({
           EXCD,
           종목코드,
           기간분류코드,
