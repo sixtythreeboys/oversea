@@ -22,7 +22,7 @@ export class BatchService {
     // });
     // this.job.start();
 
-    this.updateUpDown();
+    //this.updateUpDown();
   }
   async updateUpDown() {
     const res: [] = (await exeQuery(
