@@ -17,29 +17,19 @@ export const markets: Markets[] = [
 
 @Injectable()
 export class OverseaService {
-  async revokeP() {}
   async getList(params: HHDFS76410000) {
-    return new Promise(
-      function (resolve, reject) {
-        Promise.all(
-          ['NAS'].map((market) => {
-            return APIS.HHDFS76410000(
-              Object.assign({ EXCD: market } as HHDFS76410000, params),
-            );
-          }),
-        )
-          .then((results) => {
-            results = results
-              .map(({ status, data }: any) => data)
-              .reduce((a, c) => a.concat(c));
-            resolve({ status: 200, data: results });
-          })
-          .catch((e) => {
-            const { status, data } = e.response;
-            reject({ status, data });
-          });
-      }.bind(this),
+    let results = await Promise.all(
+      ['NAS'].map((market) => {
+        return APIS.HHDFS76410000(
+          Object.assign({ EXCD: market } as HHDFS76410000, params),
+        );
+      }),
     );
+    results = results.reduce((a, c) => a.concat(c));
+    return {
+      status: 200,
+      data: results,
+    };
   }
   async list1_1(period: number, avlsScal: number) {
     try {
@@ -102,7 +92,7 @@ export class OverseaService {
     }
   }
   async getDetail({ EXCD, 종목코드, 기간분류코드, period }) {
-    const dataHHDFS76240000 = await APIS.HHDFS76240000(
+    const datas = await APIS.HHDFS76240000(
       {
         EXCD: EXCD,
         SYMB: 종목코드,
@@ -115,10 +105,9 @@ export class OverseaService {
       } as any,
       period,
     );
-    const { status, data } = dataHHDFS76240000 as { status; data };
     return {
-      status,
-      data: data.dataList.map(
+      status: 200,
+      data: datas.map(
         ({
           xymd,
           clos,

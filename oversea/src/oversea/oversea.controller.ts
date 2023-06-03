@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Query, Post, Res } from '@nestjs/common';
 import { OverseaService } from './oversea.service';
 import { Response } from 'express';
-
+import CONFIG from '../../config';
 import { enqueue } from 'src/common/util/delayingQueue';
 
 @Controller('oversea')
@@ -17,6 +17,12 @@ export class OverseaController {
       });
     }
     res.send('test');
+  }
+  @Get('test2')
+  async test2(@Res() res: Response, @Query() params: any) {
+    const result = await this.oversea.getList({} as any);
+
+    res.send(result);
   }
 
   @Get('list')
@@ -53,7 +59,9 @@ export class OverseaController {
       if (!['D', 'W', 'M'].includes(기간분류코드)) {
         return false;
       }
-      period = period ? parseInt(period as string) : 30;
+      period = period
+        ? parseInt(period as string)
+        : CONFIG.KIS.urls.해외주식_기간별시세.defaultLength;
       if (Number.isNaN(period)) {
         return false;
       }

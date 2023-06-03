@@ -21,6 +21,7 @@ export default {
       해외주식_기간별시세: {
         path: '/uapi/overseas-price/v1/quotations/dailyprice',
         tr_id: 'HHDFS76240000',
+        defaultLength: 100,
       },
       해외주식조건검색: {
         path: '/uapi/overseas-price/v1/quotations/inquire-search',
