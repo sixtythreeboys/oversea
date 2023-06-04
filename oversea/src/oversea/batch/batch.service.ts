@@ -22,15 +22,14 @@ export class BatchService {
     // });
     // this.job.start();
 
-    //this.updateUpDown();
+    this.updateUpDown();
   }
   async updateUpDown() {
-    const res: [] = (await exeQuery(
+    let dataList: any[] = (await exeQuery(
       `select distinct excd, symb from OVERSEA_ITEM_MAST;`,
     )) as [];
-
-    for (const { excd, symb } of res) {
-      (async function ({ excd, symb }) {
+    dataList = await Promise.all(
+      dataList.map(async ({ excd, symb }) => {
         const detail: any = await APIS.HHDFS76240000(
           {
             EXCD: excd,
@@ -40,44 +39,14 @@ export class BatchService {
           } as any,
           1,
         ).then((e: any) => (e.data.dataList ? e.data.dataList[0] : null));
+
         if (detail === null) {
           console.log(excd, symb, '종목가격정보 조회 실패');
-          return;
+          return null;
         }
-
-        // const OVERSEA_CONTINUOUS_INFO = await exeQuery(
-        //   `select updown,continuous,stckClpr,basedate
-        //      from OVERSEA_CONTINUOUS_INFO
-        //     where excd = '${excd}'
-        //       and symb = '${symb}';`,
-        // );
-        // console.log(OVERSEA_CONTINUOUS_INFO);
-
-        exeQuery(`
-          INSERT INTO OVERSEA_CONTINUOUS_INFO(excd,symb,updown,continuous,stckClpr,basedate)
-          VALUES ('${excd}','${symb}',${
-          parseFloat(detail.rate) > 0
-            ? "'U'"
-            : parseFloat(detail.rate) < 0
-            ? "'D'"
-            : 'null'
-        }, -1, ${
-          Number.isNaN(parseInt(detail.clos)) ? 'null' : detail.clos
-        }, '${detail.xymd}');
-        `).catch((e) => {
-          console.log(e);
-          console.log(`
-          INSERT INTO OVERSEA_CONTINUOUS_INFO(excd,symb,updown,continuous,stckClpr,basedate)
-          VALUES ('${excd}','${symb}',${
-            parseFloat(detail.rate) > 0
-              ? "'U'"
-              : parseFloat(detail.rate) < 0
-              ? "'D'"
-              : 'null'
-          }, -1, ${detail.clos}, '${detail.xymd}');
-          `);
-        });
-      })({ excd, symb });
-    }
+        return detail;
+      }),
+    ).then((e) => e.filter((e) => e !== null));
+    console.log(dataList);
   }
 }
