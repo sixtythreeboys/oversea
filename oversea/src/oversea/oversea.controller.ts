@@ -4,9 +4,6 @@ import { Response } from 'express';
 import CONFIG from '../../config';
 import { enqueue } from 'src/common/util/delayingQueue';
 
-import { mergeList } from 'src/DB/DB.oversea_HHDFS76240000';
-import { APIS } from 'src/KIS/KISAPIS';
-
 @Controller('oversea')
 export class OverseaController {
   constructor(private readonly oversea: OverseaService) {}
@@ -23,24 +20,7 @@ export class OverseaController {
   }
   @Get('test2')
   async test2(@Res() res: Response, @Query() params: any) {
-    const datas = await APIS.HHDFS76240000(
-      {
-        EXCD: 'NAS',
-        SYMB: 'AAPL',
-        GUBN: '0',
-        name: '-',
-      } as any,
-      15,
-    );
-    mergeList(
-      datas.map((e) =>
-        Object.assign(e, {
-          excd: 'NAS',
-          symb: 'AAPL',
-        }),
-      ) as any[],
-    );
-    res.send(datas);
+    res.send('datas');
   }
 
   @Get('list')

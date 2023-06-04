@@ -4,6 +4,7 @@ import { OverseaService } from 'src/oversea/oversea.service';
 import { APIS } from 'src/KIS/KISAPIS';
 import { updateToken } from '../oversea.middleware';
 import { exeQuery } from 'src/DB/DB.service';
+import { writeFileSync } from 'fs';
 
 @Injectable()
 export class BatchService {
@@ -38,8 +39,13 @@ export class BatchService {
             name: '-',
           } as any,
           1,
-        ).then((e: any) => (e.data.dataList ? e.data.dataList[0] : null));
-
+        )
+          .then((detail: any) => (detail.length > 0 ? detail[0] : null))
+          .catch((e) => {
+            console.log(excd, symb);
+            console.log(e);
+          });
+        console.log(excd, symb);
         if (detail === null) {
           console.log(excd, symb, '종목가격정보 조회 실패');
           return null;
@@ -47,6 +53,6 @@ export class BatchService {
         return detail;
       }),
     ).then((e) => e.filter((e) => e !== null));
-    console.log(dataList);
+    writeFileSync('output', JSON.stringify(dataList, null, 2), 'utf8');
   }
 }
