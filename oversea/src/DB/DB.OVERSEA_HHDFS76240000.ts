@@ -1,5 +1,6 @@
 import { dbModel } from './DB.model';
 import { exeQuery } from './DB.service';
+import { writeFileSync } from 'fs';
 
 export class OVERSEA_HHDFS76240000 {
   excd: string;
@@ -52,8 +53,16 @@ export async function mergeList(
       pask = VALUES(pask),
       vask = VALUES(vask);                
     `;
-    await exeQuery(sql);
-    return true;
+    writeFileSync('output', sql, 'utf8');
+    const res = await exeQuery(sql)
+      .then((e) => {
+        return true;
+      })
+      .catch((e) => {
+        return false;
+      });
+
+    return res;
   } catch (err) {
     dbModel.connection.rollback(function () {
       throw err;

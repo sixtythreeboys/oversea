@@ -5,6 +5,8 @@ import { APIS } from 'src/KIS/KISAPIS';
 import { updateToken } from '../oversea.middleware';
 import { exeQuery } from 'src/DB/DB.service';
 import { writeFileSync } from 'fs';
+import { mergeList } from 'src/DB/DB.OVERSEA_HHDFS76240000';
+import { dbModel } from 'src/DB/DB.model';
 
 @Injectable()
 export class BatchService {
@@ -42,17 +44,28 @@ export class BatchService {
         )
           .then((detail: any) => (detail.length > 0 ? detail[0] : null))
           .catch((e) => {
-            console.log(excd, symb);
             console.log(e);
+            return null;
           });
         console.log(excd, symb);
         if (detail === null) {
           console.log(excd, symb, '종목가격정보 조회 실패');
           return null;
+        } else {
+          detail.excd = excd;
+          detail.symb = symb;
         }
         return detail;
       }),
-    ).then((e) => e.filter((e) => e !== null));
-    writeFileSync('output', JSON.stringify(dataList, null, 2), 'utf8');
+    ).then((dataList) => dataList.filter((e) => e));
+
+    if (await mergeList(dataList)) {
+      console.log(
+        `${dataList.length} items inserted into OVERSEA_HHDFS76240000.`,
+      );
+      dbModel.connection.commit();
+    } else {
+      console.log('insert failed');
+    }
   }
 }
