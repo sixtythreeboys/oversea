@@ -51,11 +51,11 @@ export default {
   EUREKA: {
     instance: {
       app: 'oversea',
-      hostName: 'ec2-18-119-118-205.us-east-2.compute.amazonaws.com',
-      ipAddr: 'ec2-18-119-118-205.us-east-2.compute.amazonaws.com',
+      hostName: 'ec2-3-136-15-208.us-east-2.compute.amazonaws.com',
+      ipAddr: 'ec2-3-136-15-208.us-east-2.compute.amazonaws.com',
       instanceId: 'oversea',
       statusPageUrl:
-        'http://ec2-18-119-118-205.us-east-2.compute.amazonaws.com:8082/test',
+        'http://ec2-3-136-15-208.us-east-2.compute.amazonaws.com:8082/test',
       port: {
         $: 8082,
         '@enabled': true,
