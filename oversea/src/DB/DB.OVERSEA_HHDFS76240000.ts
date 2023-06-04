@@ -1,3 +1,6 @@
+import { dbModel } from './DB.model';
+import { exeQuery } from './DB.service';
+
 export class OVERSEA_HHDFS76240000 {
   excd: string;
   symb: string;
@@ -22,4 +25,38 @@ export class OVERSEA_HHDFS76240000 {
   }
 }
 
-export async function mergeList(datalist: OVERSEA_HHDFS76240000[]) {}
+export async function mergeList(
+  itemList: OVERSEA_HHDFS76240000[],
+): Promise<boolean> {
+  try {
+    const sql = `
+    INSERT INTO OVERSEA_HHDFS76240000 (excd, symb, xymd, clos, sign, diff, rate, \`open\`, high, low, tvol, tamt, pbid, vbid, pask, vask)
+    VALUES ${itemList
+      .map(
+        (item) =>
+          `('${item.excd}', '${item.symb}', '${item.xymd}', ${item.clos}, '${item.sign}', ${item.diff}, '${item.rate}', ${item.open}, ${item.high}, ${item.low}, ${item.tvol}, ${item.tamt}, ${item.pbid}, ${item.vbid}, ${item.pask}, ${item.vask})`,
+      )
+      .join(', ')}
+    ON DUPLICATE KEY UPDATE
+      clos = VALUES(clos),
+      sign = VALUES(sign),
+      diff = VALUES(diff),
+      rate = VALUES(rate),
+      \`open\` = VALUES(\`open\`),
+      high = VALUES(high),
+      low = VALUES(low),
+      tvol = VALUES(tvol),
+      tamt = VALUES(tamt),
+      pbid = VALUES(pbid),
+      vbid = VALUES(vbid),
+      pask = VALUES(pask),
+      vask = VALUES(vask);                
+    `;
+    await exeQuery(sql);
+    return true;
+  } catch (err) {
+    dbModel.connection.rollback(function () {
+      throw err;
+    });
+  }
+}

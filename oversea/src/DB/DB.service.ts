@@ -18,7 +18,9 @@ export async function exeQuery(query: string) {
   return new Promise((resolve, reject) => {
     dbModel.connection.query(query, (error, results, fields) => {
       if (error) {
-        reject(error);
+        dbModel.connection.rollback(function () {
+          reject(error);
+        });
       }
       resolve(results);
     });
