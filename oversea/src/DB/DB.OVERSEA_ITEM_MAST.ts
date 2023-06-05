@@ -1,6 +1,6 @@
 import { exeQuery } from './DB.service';
 
-export interface OverseaItemMast {
+export interface OVERSEA_ITEM_MAST {
   ncod: string | null; // National code
   exid: string | null; // Exchange id
   excd: string | null; // Exchange code

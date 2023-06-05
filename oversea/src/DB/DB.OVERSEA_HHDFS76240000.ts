@@ -30,8 +30,6 @@ export class OVERSEA_HHDFS76240000 {
 export async function mergeList(
   itemList: OVERSEA_HHDFS76240000[],
 ): Promise<boolean> {
-  const FILENAME = `mergeList_${getToday()}`;
-  writeFileSync(FILENAME, getToday() + '\n', 'utf8');
   try {
     for (const item of itemList) {
       const sql = `
@@ -56,7 +54,6 @@ export async function mergeList(
         console.log(
           `'${item.excd}', '${item.symb}', '${item.xymd}' insert failed`,
         );
-        appendFileSync(FILENAME, sql, 'utf8');
       });
     }
 

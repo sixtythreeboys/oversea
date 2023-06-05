@@ -7,6 +7,7 @@ import {
   CTOS5011R,
 } from '../oversea/oversea.type';
 import { enqueue } from 'src/common/util/delayingQueue';
+import { getToday } from 'src/common/util/dateUtils';
 
 export const APICallers = {
   async oauth2Approval() {
@@ -94,7 +95,7 @@ export const APICallers = {
       headers: makeHeader(
         Object.assign(
           {
-            tr_id: 'HHDFS76240000',
+            tr_id: 'CTOS5011R',
             custtype: 'P',
           },
           headers,
@@ -102,15 +103,23 @@ export const APICallers = {
       ),
       params: Object.assign(
         {
-          AUTH: '',
-          EXCD: 'NAS',
-          GUBN: '0',
-          BYMD: '',
-          MODP: '1',
-        } as HHDFS76240000,
+          TRAD_DT: getToday(),
+          CTX_AREA_NK: '',
+          CTX_AREA_FK: '',
+        } as CTOS5011R,
         params,
       ),
     });
+    const { ctx_area_fk, ctx_area_nk, output, rt_cd, msg_cd, msg1 } =
+      recvData.data;
+
+    if (rt_cd !== '0') {
+      throw { status: 500, data: { rt_cd, msg1 } };
+    }
+    return {
+      data: output,
+      cont: ['M'].includes(recvData.headers.tr_cont) ? 'Y' : 'N',
+    };
   },
 };
 
@@ -142,6 +151,10 @@ export const APIS = {
       }
     }
     return ret;
+  },
+  async CTOS5011R(params: any) {
+    const recvData = await APICallers.CTOS5011R({}, params);
+    return recvData;
   },
 };
 

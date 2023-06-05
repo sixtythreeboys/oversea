@@ -3,8 +3,11 @@ import { CronJob } from 'cron';
 import { OverseaService } from 'src/oversea/oversea.service';
 import { APIS } from 'src/KIS/KISAPIS';
 import { updateToken } from '../oversea.middleware';
-import { exeQuery } from 'src/DB/DB.service';
-import { mergeList } from 'src/DB/DB.OVERSEA_HHDFS76240000';
+import { mergeList as OVERSEA_HHDFS76240000_merge } from 'src/DB/DB.OVERSEA_HHDFS76240000';
+import {
+  TRADING_MARKETS_OPEN_DATE,
+  mergeList as TRADING_MARKETS_OPEN_DATE_merge,
+} from 'src/DB/DB.TRADING_MARKETS_OPEN_DATE';
 import { dbModel } from 'src/DB/DB.model';
 import { getToday } from 'src/common/util/dateUtils';
 import { getItemList } from 'src/DB/DB.OVERSEA_ITEM_MAST';
@@ -26,7 +29,19 @@ export class BatchService {
     // });
     // this.job.start();
 
-    this.updateUpDown(getToday());
+    //this.updateUpDown(getToday());
+    this.updateTradingDate(getToday());
+  }
+  async updateTradingDate(basedate) {
+    const recvData = await APIS.CTOS5011R({ TRAD_DT: basedate });
+    if (await TRADING_MARKETS_OPEN_DATE_merge(recvData.data)) {
+      console.log(
+        `${recvData.data.length} items inserted into TRADING_MARKETS_OPEN_DATE.`,
+      );
+      dbModel.connection.commit();
+    } else {
+      console.log('insert failed');
+    }
   }
   async updateUpDown(basedate) {
     let dataList: any[] = await getItemList();
@@ -57,7 +72,7 @@ export class BatchService {
       }),
     ).then((dataList) => dataList.filter((e) => e));
 
-    if (await mergeList(dataList)) {
+    if (await OVERSEA_HHDFS76240000_merge(dataList)) {
       console.log(
         `${dataList.length} items inserted into OVERSEA_HHDFS76240000.`,
       );
