@@ -27,6 +27,10 @@ export default {
         path: '/uapi/overseas-price/v1/quotations/inquire-search',
         tr_id: 'HHDFS76410000',
       },
+      해외결제일자조회: {
+        path: '/uapi/overseas-stock/v1/quotations/countries-holiday',
+        tr_id: 'CTOS5011R',
+      },
       접근토큰발급: {
         path: '/oauth2/tokenP',
       },

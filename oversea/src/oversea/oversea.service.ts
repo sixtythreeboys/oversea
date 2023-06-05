@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { HHDFS76410000 } from './oversea.type';
 import { Markets } from './oversea.type';
 import { APIS } from '../KIS/KISAPIS';
+import { getItemList } from 'src/DB/DB.OVERSEA_ITEM_MAST';
 
 export const markets: Markets[] = [
   'NYS',
@@ -49,7 +50,6 @@ export class OverseaService {
           {
             EXCD: item.excd,
             SYMB: item.symb,
-            name: '-',
           } as any,
           period,
         );

@@ -7,6 +7,7 @@ import { exeQuery } from 'src/DB/DB.service';
 import { mergeList } from 'src/DB/DB.OVERSEA_HHDFS76240000';
 import { dbModel } from 'src/DB/DB.model';
 import { getToday } from 'src/common/util/dateUtils';
+import { getItemList } from 'src/DB/DB.OVERSEA_ITEM_MAST';
 
 @Injectable()
 export class BatchService {
@@ -28,9 +29,7 @@ export class BatchService {
     this.updateUpDown(getToday());
   }
   async updateUpDown(basedate) {
-    let dataList: any[] = (await exeQuery(
-      `select distinct excd, symb from OVERSEA_ITEM_MAST;`,
-    )) as [];
+    let dataList: any[] = await getItemList();
     dataList = await Promise.all(
       dataList.map(async ({ excd, symb }) => {
         const detail: any = await APIS.HHDFS76240000(

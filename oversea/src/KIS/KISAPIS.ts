@@ -4,6 +4,7 @@ import {
   HHDFS76410000,
   HHDFS76240000,
   makeHeader,
+  CTOS5011R,
 } from '../oversea/oversea.type';
 import { enqueue } from 'src/common/util/delayingQueue';
 
@@ -85,6 +86,31 @@ export const APICallers = {
       data: output2,
       cont: ['M', 'F'].includes(recvData.headers.tr_cont) ? 'Y' : 'N',
     };
+  },
+  async CTOS5011R(headers: any, params: CTOS5011R) {
+    const recvData: { status; headers; data } = await axios({
+      method: 'get',
+      url: `${config.KIS.real}${config.KIS.urls.해외주식_기간별시세.path}`,
+      headers: makeHeader(
+        Object.assign(
+          {
+            tr_id: 'HHDFS76240000',
+            custtype: 'P',
+          },
+          headers,
+        ),
+      ),
+      params: Object.assign(
+        {
+          AUTH: '',
+          EXCD: 'NAS',
+          GUBN: '0',
+          BYMD: '',
+          MODP: '1',
+        } as HHDFS76240000,
+        params,
+      ),
+    });
   },
 };
 

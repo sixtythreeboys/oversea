@@ -51,6 +51,12 @@ export type HHDFS76240000 = {
   KEYB: string;
 };
 
+export type CTOS5011R = {
+  TRAD_DT: string;
+  CTX_AREA_NK: '';
+  CTX_AREA_FK: '';
+};
+
 export type Header = {
   'content-type'?: string;
   authorization?: string;
