@@ -4,9 +4,9 @@ import { OverseaService } from 'src/oversea/oversea.service';
 import { APIS } from 'src/KIS/KISAPIS';
 import { updateToken } from '../oversea.middleware';
 import { exeQuery } from 'src/DB/DB.service';
-import { writeFileSync } from 'fs';
 import { mergeList } from 'src/DB/DB.OVERSEA_HHDFS76240000';
 import { dbModel } from 'src/DB/DB.model';
+import { getToday } from 'src/common/util/dateUtils';
 
 @Injectable()
 export class BatchService {
@@ -25,9 +25,9 @@ export class BatchService {
     // });
     // this.job.start();
 
-    this.updateUpDown();
+    this.updateUpDown(getToday());
   }
-  async updateUpDown() {
+  async updateUpDown(basedate) {
     let dataList: any[] = (await exeQuery(
       `select distinct excd, symb from OVERSEA_ITEM_MAST;`,
     )) as [];
@@ -38,7 +38,7 @@ export class BatchService {
             EXCD: excd,
             SYMB: symb,
             GUBN: '0',
-            name: '-',
+            BYMD: basedate,
           } as any,
           1,
         )
@@ -47,7 +47,6 @@ export class BatchService {
             console.log(e);
             return null;
           });
-        console.log(excd, symb);
         if (detail === null) {
           console.log(excd, symb, '종목가격정보 조회 실패');
           return null;
