@@ -1,6 +1,7 @@
+import { getToday } from 'src/common/util/dateUtils';
 import { dbModel } from './DB.model';
 import { exeQuery } from './DB.service';
-import { writeFileSync } from 'fs';
+import { appendFileSync, writeFileSync } from 'fs';
 
 export class OVERSEA_HHDFS76240000 {
   excd: string;
@@ -29,40 +30,37 @@ export class OVERSEA_HHDFS76240000 {
 export async function mergeList(
   itemList: OVERSEA_HHDFS76240000[],
 ): Promise<boolean> {
+  writeFileSync('output', getToday() + '\n', 'utf8');
   try {
-    const sql = `
-    INSERT INTO OVERSEA_HHDFS76240000 (excd, symb, xymd, clos, sign, diff, rate, \`open\`, high, low, tvol, tamt, pbid, vbid, pask, vask)
-    VALUES ${itemList
-      .map(
-        (item) =>
-          `('${item.excd}', '${item.symb}', '${item.xymd}', ${item.clos}, '${item.sign}', ${item.diff}, '${item.rate}', ${item.open}, ${item.high}, ${item.low}, ${item.tvol}, ${item.tamt}, ${item.pbid}, ${item.vbid}, ${item.pask}, ${item.vask})`,
-      )
-      .join(', ')}
-    ON DUPLICATE KEY UPDATE
-      clos = VALUES(clos),
-      sign = VALUES(sign),
-      diff = VALUES(diff),
-      rate = VALUES(rate),
-      \`open\` = VALUES(\`open\`),
-      high = VALUES(high),
-      low = VALUES(low),
-      tvol = VALUES(tvol),
-      tamt = VALUES(tamt),
-      pbid = VALUES(pbid),
-      vbid = VALUES(vbid),
-      pask = VALUES(pask),
-      vask = VALUES(vask);                
-    `;
-    writeFileSync('output', sql, 'utf8');
-    const res = await exeQuery(sql)
-      .then((e) => {
-        return true;
-      })
-      .catch((e) => {
-        return false;
+    for (const item of itemList) {
+      const sql = `
+      INSERT INTO OVERSEA_HHDFS76240000 (excd, symb, xymd, clos, sign, diff, rate, \`open\`, high, low, tvol, tamt, pbid, vbid, pask, vask)
+      VALUES ('${item.excd}', '${item.symb}', '${item.xymd}', ${item.clos}, '${item.sign}', ${item.diff}, '${item.rate}', ${item.open}, ${item.high}, ${item.low}, ${item.tvol}, ${item.tamt}, ${item.pbid}, ${item.vbid}, ${item.pask}, ${item.vask})
+      ON DUPLICATE KEY UPDATE
+        clos = VALUES(clos),
+        sign = VALUES(sign),
+        diff = VALUES(diff),
+        rate = VALUES(rate),
+        \`open\` = VALUES(\`open\`),
+        high = VALUES(high),
+        low = VALUES(low),
+        tvol = VALUES(tvol),
+        tamt = VALUES(tamt),
+        pbid = VALUES(pbid),
+        vbid = VALUES(vbid),
+        pask = VALUES(pask),
+        vask = VALUES(vask);                
+      `;
+      await exeQuery(sql).catch((e) => {
+        console.log(
+          `'${item.excd}', '${item.symb}', '${item.xymd}' insert failed`,
+        );
+        appendFileSync('output', sql, 'utf8');
+        //console.log(e);
       });
+    }
 
-    return res;
+    return true;
   } catch (err) {
     dbModel.connection.rollback(function () {
       throw err;
