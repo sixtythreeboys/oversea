@@ -1,7 +1,6 @@
 import { getToday } from 'src/common/util/dateUtils';
 import { dbModel } from './DB.model';
 import { exeQuery } from './DB.service';
-import { appendFileSync, writeFileSync } from 'fs';
 
 export class OVERSEA_HHDFS76240000 {
   excd: string;

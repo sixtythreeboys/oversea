@@ -39,3 +39,12 @@ export function addOneDay(date: string): string {
 
   return `${newYear}${newMonth}${newDay}`;
 }
+
+export function getDateList(start, end) {
+  const res = [];
+  [start, end] = [addOneDay(start), addOneDay(end)];
+  for (let day = start; day !== end; day = addOneDay(day)) {
+    res.push(day);
+  }
+  return res;
+}

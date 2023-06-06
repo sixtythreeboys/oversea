@@ -20,6 +20,7 @@ export class OverseaController {
   }
   @Get('test2')
   async test2(@Res() res: Response, @Query() params: any) {
+    await this.oversea.list_v2(3, 0);
     res.send('datas');
   }
 

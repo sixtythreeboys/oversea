@@ -46,19 +46,67 @@ export async function mergeList(
 export async function getLastDay() {
   try {
     const sql = `
-        SELECT MIN(basedate)
+        SELECT MIN(basedate) as lastD
           FROM OVERSEA_CONTINUOUS_INFO;
       `;
 
     const lastday = await exeQuery(sql).catch((e) => {
       console.log(`'getLastDay failed`);
     });
-    console.log(lastday);
-    return lastday;
+    return lastday[0].lastD;
   } catch (err) {
     dbModel.connection.rollback(function () {
       throw err;
     });
+    return null;
+  }
+}
+
+export async function getData(excd, symb) {
+  try {
+    const sql = ` 
+        select updown, continuous, stckClpr, basedate
+          from OVERSEA_CONTINUOUS_INFO oci
+         where excd = '${excd}'
+           and symb = '${symb}';
+         `;
+
+    const lastday = await exeQuery(sql).catch((e) => {
+      console.log(`'getLastDay failed`);
+    });
+    return lastday[0];
+  } catch (err) {
+    dbModel.connection.rollback(function () {
+      throw err;
+    });
+    return null;
+  }
+}
+
+export async function getDataByOption(period: number, avlsScal: number) {
+  try {
+    const sql = ` 
+    select excd, symb
+      from OVERSEA_CONTINUOUS_INFO oci
+     where continuous >= ${Math.abs(period)}
+       and CONVERT(stckClpr, FLOAT) ${
+         avlsScal === 0
+           ? 'is not null'
+           : avlsScal < 0
+           ? `<= ${Math.abs(avlsScal)}`
+           : `>= ${Math.abs(avlsScal)}`
+       } 
+       and updown ${
+         period === 0 ? 'is not null' : period > 0 ? `= 'U'` : `= 'D'`
+       };
+      `;
+    console.log(sql);
+    const recvData = await exeQuery(sql).catch((e) => {
+      console.log(`'getLastDay failed`);
+    });
+    return recvData;
+  } catch (err) {
+    console.log(err);
     return null;
   }
 }

@@ -7,11 +7,17 @@ import { mergeList as OVERSEA_HHDFS76240000_merge } from 'src/DB/DB.OVERSEA_HHDF
 import { mergeList as TRADING_MARKETS_OPEN_DATE_merge } from 'src/DB/DB.TRADING_MARKETS_OPEN_DATE';
 import {
   mergeList as OVERSEA_CONTINUOUS_INFO_merge,
+  getData,
   getLastDay,
 } from 'src/DB/DB.OVERSEA_CONTINUOUS_INFO';
 import { dbModel } from 'src/DB/DB.model';
 import { getItemList } from 'src/DB/DB.OVERSEA_ITEM_MAST';
-import { getToday } from 'src/common/util/dateUtils';
+import {
+  addOneDay,
+  getDateDiff,
+  getDateList,
+  getToday,
+} from 'src/common/util/dateUtils';
 
 import { writeFileSync, appendFileSync } from 'fs';
 
@@ -27,13 +33,18 @@ export class BatchService {
   async moduleInit() {
     // Access and use the MyService within the initialization logic
     await updateToken();
-    // this.job = new CronJob('0 0 1 * * *', async () => {
-    //   this.updateUpDown();
-    //   this.updateTradingDate(getToday());
-    // });
-    // this.job.start();
+    this.job = new CronJob('0 0 1 * * *', async () => {
+      (async function () {
+        const dateList = getDateList(await getLastDay(), getToday());
+        for (const date of dateList) {
+          this.updateUpDown(date).catch((e) => console.log(e));
+        }
+      })();
 
-    this.updateUpDown(getToday());
+      this.updateTradingDate(getToday()).catch((e) => console.log(e));
+    });
+    this.job.start();
+
     //this.updateTradingDate(getToday());
   }
   async updateTradingDate(basedate) {
@@ -48,8 +59,58 @@ export class BatchService {
     }
   }
   async updateUpDown(basedate) {
-    const lastday = await getLastDay();
-    console.log(lastday);
+    const itemList: any[] = await getItemList();
+    const updateData = [];
+    for (const item of itemList.slice(0, 1)) {
+      const [continuousData, recvData] = await Promise.all([
+        getData(item.excd, item.symb),
+        APIS.HHDFS76240000(
+          {
+            EXCD: item.excd,
+            SYMB: item.symb,
+            GUBN: '0',
+            BYMD: basedate,
+          } as any,
+          1,
+        )
+          .then((detail: any) => (detail.length > 0 ? detail[0] : null))
+          .catch((e) => {
+            console.log(e);
+            return null;
+          }),
+      ]);
+      if (recvData === null) {
+        return;
+      }
+      if (continuousData.updown === 'D') {
+        if (parseFloat(recvData.rate) >= 0) {
+          continuousData.continuous =
+            continuousData.continuous > 0 ? continuousData.continuous + 1 : 1;
+        } else if (parseFloat(recvData.rate) < 0) {
+          continuousData.continuous = 1;
+          continuousData.updown = 'U';
+        }
+      } else if (continuousData.updown === 'U') {
+        if (parseFloat(recvData.rate) <= 0) {
+          continuousData.continuous =
+            continuousData.continuous > 0 ? continuousData.continuous + 1 : 1;
+        } else if (parseFloat(recvData.rate) > 0) {
+          continuousData.continuous = 1;
+          continuousData.updown = 'D';
+        }
+      }
+      continuousData.stckClpr = recvData.clos;
+      continuousData.basedate = basedate;
+      updateData.push(continuousData);
+    }
+    if (await OVERSEA_CONTINUOUS_INFO_merge(updateData)) {
+      console.log(
+        `${updateData.length} items inserted into OVERSEA_CONTINUOUS_INFO.`,
+      );
+      dbModel.connection.commit();
+    } else {
+      console.log('insert failed');
+    }
   }
   async updateDetailInfo(basedate) {
     let dataList: any[] = await getItemList();

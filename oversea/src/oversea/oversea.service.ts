@@ -3,6 +3,7 @@ import { HHDFS76410000 } from './oversea.type';
 import { Markets } from './oversea.type';
 import { APIS } from '../KIS/KISAPIS';
 import { getItemList } from 'src/DB/DB.OVERSEA_ITEM_MAST';
+import { getDataByOption } from 'src/DB/DB.OVERSEA_CONTINUOUS_INFO';
 
 export const markets: Markets[] = [
   'NYS',
@@ -91,7 +92,10 @@ export class OverseaService {
       return { status: 500, data: error };
     }
   }
-  async list_v2(period: number, avlsScal: number) {}
+  async list_v2(period: number, avlsScal: number) {
+    const itemList = await getDataByOption(period, avlsScal);
+    console.log(itemList);
+  }
 
   async getDetail_v1({ EXCD, 종목코드, 기간분류코드, period }) {
     const datas = await APIS.HHDFS76240000(
