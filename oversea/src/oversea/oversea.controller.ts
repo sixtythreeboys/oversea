@@ -18,11 +18,19 @@ export class OverseaController {
     }
     res.send('test');
   }
-  @Get('test2')
-  async test2(@Res() res: Response, @Query() params: any) {
-    await this.oversea.list_v2(3, 0);
-    res.send('datas');
-  }
+  // @Get('test2')
+  // async test2(@Res() res: Response, @Query() params: any) {
+  //   this.oversea
+  //     .list_v2(80, 0)
+  //     .then((e: { status; data }) => {
+  //       const { status, data } = e;
+  //       res.status(status).send(data);
+  //     })
+  //     .catch((e: { status; data }) => {
+  //       const { status, data } = e;
+  //       res.status(status).send(data);
+  //     });
+  // }
 
   @Get('list')
   async list(
@@ -31,7 +39,7 @@ export class OverseaController {
     @Query('avlsScal') avlsScal: string,
   ) {
     this.oversea
-      .list_v1(parseInt(period), parseInt(avlsScal))
+      .list_v2(parseInt(period), parseInt(avlsScal))
       .then((e: { status; data }) => {
         const { status, data } = e;
         res.status(status).send(data);
@@ -40,15 +48,6 @@ export class OverseaController {
         const { status, data } = e;
         res.status(status).send(data);
       });
-  }
-
-  @Get('list2')
-  async list2(
-    @Res() res: Response,
-    @Query('period') period: string,
-    @Query('avlsScal') avlsScal: string,
-  ) {
-    this.oversea.list_v2(parseInt(period), parseInt(avlsScal));
   }
 
   @Get('price-by-period')

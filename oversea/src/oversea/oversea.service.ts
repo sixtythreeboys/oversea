@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { HHDFS76410000 } from './oversea.type';
 import { Markets } from './oversea.type';
 import { APIS } from '../KIS/KISAPIS';
-import { getItemList } from 'src/DB/DB.OVERSEA_ITEM_MAST';
+import { getItemByKey, getItemList } from 'src/DB/DB.OVERSEA_ITEM_MAST';
 import { getDataByOption } from 'src/DB/DB.OVERSEA_CONTINUOUS_INFO';
 
 export const markets: Markets[] = [
@@ -93,8 +93,43 @@ export class OverseaService {
     }
   }
   async list_v2(period: number, avlsScal: number) {
-    const itemList = await getDataByOption(period, avlsScal);
-    console.log(itemList);
+    let itemList = (await getDataByOption(period, avlsScal)) as {
+      excd;
+      symb;
+    }[];
+    itemList = (await Promise.all(
+      itemList.map(async (item) => {
+        let details = await APIS.HHDFS76240000(
+          {
+            EXCD: item.excd,
+            SYMB: item.symb,
+            GUBN: '0',
+          } as any,
+          period,
+        );
+        return { excd: item.excd, symb: item.symb, details };
+      }),
+    )) as [];
+    itemList = (await Promise.all(
+      itemList.map(async (item: { excd; symb; details }) => {
+        const last = item.details[0];
+        const name = await getItemByKey(item.excd, item.symb).then((e) =>
+          e ? e.knam : '-',
+        );
+        const res = {
+          excd: item.excd,
+          mkscShrnIscd: item.symb,
+          htsKorIsnm: name,
+          stckClpr: parseFloat(last.clos),
+          prdyAvlsScal: 'string',
+          prdyCtrt: parseFloat(last.rate),
+          totalCtrt: item.details.reduce((a, c) => a + parseFloat(c.rate), 0),
+        };
+        return res;
+      }),
+    )) as [];
+
+    return { status: 200, data: itemList };
   }
 
   async getDetail_v1({ EXCD, 종목코드, 기간분류코드, period }) {
@@ -150,4 +185,5 @@ export class OverseaService {
       ),
     };
   }
+  async getDetail_v2({ EXCD, 종목코드, 기간분류코드, period }) {}
 }

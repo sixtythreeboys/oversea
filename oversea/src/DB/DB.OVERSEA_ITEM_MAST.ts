@@ -32,3 +32,17 @@ export async function getItemList(): Promise<{ excd; symb }[]> {
     `select distinct excd, symb from OVERSEA_ITEM_MAST;`,
   ) as Promise<{ excd; symb }[]>;
 }
+
+export async function getItemByKey(excd, symb) {
+  const res = await exeQuery(
+    `select ncod,exid,excd,exnm,symb,rsym,knam,enam,stis,curr,zdiv,ztyp,base,bnit,anit,mstm,metm,isdr,drcd,icod,sjong,ttyp,etyp,ttyp_sb
+       from OVERSEA_ITEM_MAST
+      where excd = '${excd}'
+        and symb = '${symb}';`,
+  );
+  try {
+    return res[0];
+  } catch (e) {
+    return null;
+  }
+}

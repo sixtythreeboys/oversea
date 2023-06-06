@@ -100,7 +100,6 @@ export async function getDataByOption(period: number, avlsScal: number) {
          period === 0 ? 'is not null' : period > 0 ? `= 'U'` : `= 'D'`
        };
       `;
-    console.log(sql);
     const recvData = await exeQuery(sql).catch((e) => {
       console.log(`'getLastDay failed`);
     });
