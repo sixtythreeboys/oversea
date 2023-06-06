@@ -88,7 +88,7 @@ export class OverseaService {
         });
       return { status: 200, data: res };
     } catch (error) {
-      return { status: 200, data: error };
+      return { status: 500, data: error };
     }
   }
   async list_v2(period: number, avlsScal: number) {}
@@ -146,5 +146,4 @@ export class OverseaService {
       ),
     };
   }
-  async getDetail_v2({ EXCD, 종목코드, 기간분류코드, period }) {}
 }

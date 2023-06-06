@@ -4,13 +4,17 @@ import { OverseaService } from 'src/oversea/oversea.service';
 import { APIS } from 'src/KIS/KISAPIS';
 import { updateToken } from '../oversea.middleware';
 import { mergeList as OVERSEA_HHDFS76240000_merge } from 'src/DB/DB.OVERSEA_HHDFS76240000';
+import { mergeList as TRADING_MARKETS_OPEN_DATE_merge } from 'src/DB/DB.TRADING_MARKETS_OPEN_DATE';
 import {
-  TRADING_MARKETS_OPEN_DATE,
-  mergeList as TRADING_MARKETS_OPEN_DATE_merge,
-} from 'src/DB/DB.TRADING_MARKETS_OPEN_DATE';
+  mergeList as OVERSEA_CONTINUOUS_INFO_merge,
+  getLastDay,
+} from 'src/DB/DB.OVERSEA_CONTINUOUS_INFO';
 import { dbModel } from 'src/DB/DB.model';
-import { getToday } from 'src/common/util/dateUtils';
 import { getItemList } from 'src/DB/DB.OVERSEA_ITEM_MAST';
+import { itemlist } from './temp';
+import { getToday } from 'src/common/util/dateUtils';
+
+import { writeFileSync, appendFileSync } from 'fs';
 
 @Injectable()
 export class BatchService {
@@ -26,11 +30,12 @@ export class BatchService {
     await updateToken();
     // this.job = new CronJob('0 0 1 * * *', async () => {
     //   this.updateUpDown();
+    //   this.updateTradingDate(getToday());
     // });
     // this.job.start();
 
-    //this.updateUpDown(getToday());
-    this.updateTradingDate(getToday());
+    this.updateUpDown(getToday());
+    //this.updateTradingDate(getToday());
   }
   async updateTradingDate(basedate) {
     const recvData = await APIS.CTOS5011R({ TRAD_DT: basedate });
@@ -44,6 +49,10 @@ export class BatchService {
     }
   }
   async updateUpDown(basedate) {
+    const lastday = await getLastDay();
+    console.log(lastday);
+  }
+  async updateDetailInfo(basedate) {
     let dataList: any[] = await getItemList();
     dataList = await Promise.all(
       dataList.map(async ({ excd, symb }) => {
