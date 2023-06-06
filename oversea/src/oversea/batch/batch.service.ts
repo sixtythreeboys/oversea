@@ -11,7 +11,6 @@ import {
 } from 'src/DB/DB.OVERSEA_CONTINUOUS_INFO';
 import { dbModel } from 'src/DB/DB.model';
 import { getItemList } from 'src/DB/DB.OVERSEA_ITEM_MAST';
-import { itemlist } from './temp';
 import { getToday } from 'src/common/util/dateUtils';
 
 import { writeFileSync, appendFileSync } from 'fs';
