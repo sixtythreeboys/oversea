@@ -4,7 +4,7 @@ import { OverseaService } from 'src/oversea/oversea.service';
 import { APIS } from 'src/KIS/KISAPIS';
 import { updateToken } from '../oversea.middleware';
 import {
-  mergeList2 as OVERSEA_HHDFS76240000_merge,
+  mergeList as OVERSEA_HHDFS76240000_merge,
   getLastDay as OVERSEA_HHDFS76240000_getLastDay,
 } from 'src/DB/DB.OVERSEA_HHDFS76240000';
 import { mergeList as TRADING_MARKETS_OPEN_DATE_merge } from 'src/DB/DB.TRADING_MARKETS_OPEN_DATE';
@@ -23,6 +23,7 @@ import {
 } from 'src/common/util/dateUtils';
 
 import { writeFileSync, appendFileSync } from 'fs';
+import { tempData } from './temp';
 
 @Injectable()
 export class BatchService {
@@ -59,9 +60,6 @@ export class BatchService {
     });
     this.job.start();
 
-    this.temp(getToday())
-      .then((e) => console.log('ended'))
-      .catch((e) => console.log(e));
     //this.updateTradingDate(getToday());
   }
   async updateTradingDate(basedate) {
@@ -165,46 +163,6 @@ export class BatchService {
       dbModel.connection.commit();
     } else {
       console.log('insert failed');
-    }
-  }
-  async temp(basedate) {
-    let dataList: any[] = await getItemList();
-    dataList = await Promise.all(
-      dataList.slice(0, 2).map(async ({ excd, symb }) => {
-        const detail: any = await APIS.HHDFS76240000(
-          {
-            EXCD: excd,
-            SYMB: symb,
-            GUBN: '0',
-            BYMD: basedate,
-          } as any,
-          10,
-        )
-          .then((detail: any) => (detail.length > 0 ? detail : null))
-          .catch((e) => {
-            console.log(e);
-            return null;
-          });
-        if (detail === null) {
-          console.log(excd, symb, '종목가격정보 조회 실패');
-          return null;
-        }
-        return detail.map((e) => {
-          e.excd = excd;
-          e.symb = symb;
-          return e;
-        });
-      }),
-    ).then((dataList) => dataList.filter((e) => e));
-    for (const data of dataList) {
-      if (await OVERSEA_HHDFS76240000_merge(data)) {
-        console.log(
-          `${data[0].excd} ${data[0].symb} ${data.length} items inserted into OVERSEA_HHDFS76240000.`,
-        );
-        dbModel.connection.commit();
-      } else {
-        console.log('insert failed');
-      }
     }
   }
 }
