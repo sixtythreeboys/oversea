@@ -13,6 +13,25 @@ export type TRADING_MARKETS_OPEN_DATE = {
   baseymd: string;
 };
 
+export async function getLastDay() {
+  try {
+    const sql = `
+        SELECT MAX(basedate) as lastD
+          FROM TRADING_MARKETS_OPEN_DATE;
+      `;
+
+    const lastday = await exeQuery(sql).catch((e) => {
+      console.log(`'getLastDay failed`);
+    });
+    return lastday[0].lastD;
+  } catch (err) {
+    dbModel.connection.rollback(function () {
+      throw err;
+    });
+    return null;
+  }
+}
+
 export async function mergeList(
   itemList: TRADING_MARKETS_OPEN_DATE[],
 ): Promise<boolean> {

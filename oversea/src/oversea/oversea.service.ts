@@ -4,6 +4,8 @@ import { Markets } from './oversea.type';
 import { APIS } from '../KIS/KISAPIS';
 import { getItemByKey, getItemList } from 'src/DB/DB.OVERSEA_ITEM_MAST';
 import { getDataByOption } from 'src/DB/DB.OVERSEA_CONTINUOUS_INFO';
+import { getDataByDateList } from 'src/DB/DB.OVERSEA_HHDFS76240000';
+import { generateDateList, getToday } from 'src/common/util/dateUtils';
 
 export const markets: Markets[] = [
   'NYS',
@@ -92,6 +94,7 @@ export class OverseaService {
       return { status: 500, data: error };
     }
   }
+
   async list_v2(period: number, avlsScal: number) {
     let itemList = (await getDataByOption(period, avlsScal)) as {
       excd;
@@ -131,7 +134,43 @@ export class OverseaService {
 
     return { status: 200, data: itemList };
   }
+  async list_v3(period: number, avlsScal: number) {
+    let itemList = (await getDataByOption(period, avlsScal)) as {
+      excd;
+      symb;
+    }[];
+    itemList = (await Promise.all(
+      itemList.map(async (item) => {
+        const details = await getDataByDateList(
+          item.excd,
+          item.symb,
+          generateDateList(getToday(), period),
+        );
+        console.log(details);
+        return { excd: item.excd, symb: item.symb, details };
+      }),
+    )) as [];
+    itemList = (await Promise.all(
+      itemList.map(async (item: { excd; symb; details }) => {
+        const last = item.details[0];
+        const name = await getItemByKey(item.excd, item.symb).then((e) =>
+          e ? e.knam : '-',
+        );
+        const res = {
+          excd: item.excd,
+          mkscShrnIscd: item.symb,
+          htsKorIsnm: name,
+          stckClpr: parseFloat(last.clos),
+          prdyAvlsScal: 'string',
+          prdyCtrt: parseFloat(last.rate),
+          totalCtrt: item.details.reduce((a, c) => a + parseFloat(c.rate), 0),
+        };
+        return res;
+      }),
+    )) as [];
 
+    return { status: 200, data: itemList };
+  }
   async getDetail_v1({ EXCD, 종목코드, 기간분류코드, period }) {
     const datas = await APIS.HHDFS76240000(
       {

@@ -3,12 +3,15 @@ import { CronJob } from 'cron';
 import { OverseaService } from 'src/oversea/oversea.service';
 import { APIS } from 'src/KIS/KISAPIS';
 import { updateToken } from '../oversea.middleware';
-import { mergeList as OVERSEA_HHDFS76240000_merge } from 'src/DB/DB.OVERSEA_HHDFS76240000';
+import {
+  mergeList2 as OVERSEA_HHDFS76240000_merge,
+  getLastDay as OVERSEA_HHDFS76240000_getLastDay,
+} from 'src/DB/DB.OVERSEA_HHDFS76240000';
 import { mergeList as TRADING_MARKETS_OPEN_DATE_merge } from 'src/DB/DB.TRADING_MARKETS_OPEN_DATE';
 import {
   mergeList as OVERSEA_CONTINUOUS_INFO_merge,
   getData,
-  getLastDay,
+  getLastDay as OVERSEA_CONTINUOUS_INFO_getLastDay,
 } from 'src/DB/DB.OVERSEA_CONTINUOUS_INFO';
 import { dbModel } from 'src/DB/DB.model';
 import { getItemList } from 'src/DB/DB.OVERSEA_ITEM_MAST';
@@ -35,16 +38,30 @@ export class BatchService {
     await updateToken();
     this.job = new CronJob('0 0 1 * * *', async () => {
       (async function () {
-        const dateList = getDateList(await getLastDay(), getToday());
+        const dateList = getDateList(
+          await OVERSEA_CONTINUOUS_INFO_getLastDay(),
+          getToday(),
+        );
         for (const date of dateList) {
           this.updateUpDown(date).catch((e) => console.log(e));
         }
       })();
-
+      (async function () {
+        const dateList = getDateList(
+          await OVERSEA_HHDFS76240000_getLastDay(),
+          getToday(),
+        );
+        for (const date of dateList) {
+          this.updateDetailInfo(date).catch((e) => console.log(e));
+        }
+      });
       this.updateTradingDate(getToday()).catch((e) => console.log(e));
     });
     this.job.start();
 
+    this.temp(getToday())
+      .then((e) => console.log('ended'))
+      .catch((e) => console.log(e));
     //this.updateTradingDate(getToday());
   }
   async updateTradingDate(basedate) {
@@ -61,7 +78,7 @@ export class BatchService {
   async updateUpDown(basedate) {
     const itemList: any[] = await getItemList();
     const updateData = [];
-    for (const item of itemList.slice(0, 1)) {
+    for (const item of itemList) {
       const [continuousData, recvData] = await Promise.all([
         getData(item.excd, item.symb),
         APIS.HHDFS76240000(
@@ -148,6 +165,46 @@ export class BatchService {
       dbModel.connection.commit();
     } else {
       console.log('insert failed');
+    }
+  }
+  async temp(basedate) {
+    let dataList: any[] = await getItemList();
+    dataList = await Promise.all(
+      dataList.slice(0, 2).map(async ({ excd, symb }) => {
+        const detail: any = await APIS.HHDFS76240000(
+          {
+            EXCD: excd,
+            SYMB: symb,
+            GUBN: '0',
+            BYMD: basedate,
+          } as any,
+          10,
+        )
+          .then((detail: any) => (detail.length > 0 ? detail : null))
+          .catch((e) => {
+            console.log(e);
+            return null;
+          });
+        if (detail === null) {
+          console.log(excd, symb, '종목가격정보 조회 실패');
+          return null;
+        }
+        return detail.map((e) => {
+          e.excd = excd;
+          e.symb = symb;
+          return e;
+        });
+      }),
+    ).then((dataList) => dataList.filter((e) => e));
+    for (const data of dataList) {
+      if (await OVERSEA_HHDFS76240000_merge(data)) {
+        console.log(
+          `${data[0].excd} ${data[0].symb} ${data.length} items inserted into OVERSEA_HHDFS76240000.`,
+        );
+        dbModel.connection.commit();
+      } else {
+        console.log('insert failed');
+      }
     }
   }
 }

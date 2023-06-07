@@ -48,3 +48,20 @@ export function getDateList(start, end) {
   }
   return res;
 }
+
+export function generateDateList(startDate: string, period: number): string[] {
+  const dateArray: string[] = [];
+  const currentDate = new Date(startDate);
+
+  for (let i = 0; i < period; i++) {
+    const year = currentDate.getFullYear();
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+    const day = currentDate.getDate().toString().padStart(2, '0');
+    const formattedDate = `${year}${month}${day}`;
+    dateArray.push(formattedDate);
+
+    currentDate.setDate(currentDate.getDate() - 1); // Subtract one day from the current date
+  }
+
+  return dateArray.reverse();
+}
