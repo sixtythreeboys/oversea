@@ -51,7 +51,11 @@ export function getDateList(start, end) {
 
 export function generateDateList(startDate: string, period: number): string[] {
   const dateArray: string[] = [];
-  const currentDate = new Date(startDate);
+  const year = Number(startDate.substring(0, 4));
+  const month = Number(startDate.substring(4, 6)) - 1; // Subtract 1 from the month since it's zero-based in JavaScript Date object
+  const day = Number(startDate.substring(6, 8));
+
+  const currentDate = new Date(year, month, day);
 
   for (let i = 0; i < period; i++) {
     const year = currentDate.getFullYear();
