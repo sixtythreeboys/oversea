@@ -21,14 +21,18 @@ export async function mergeList(
   try {
     for (const item of itemList) {
       const sql = `
-        INSERT INTO OVERSEA_CONTINUOUS_INFO (excd, symb, updown, continuous, stckClpr, basedate)
-        VALUES ('${item.excd}', '${item.symb}', '${item.updown}', ${item.continuous}, ${item.stckClpr}, '${item.basedate}')
-        ON DUPLICATE KEY UPDATE
-          updown = VALUES(updown),
-          continuous = VALUES(continuous),
-          stckClpr = VALUES(stckClpr),
-          basedate = VALUES(basedate);
-      `;
+    INSERT INTO OVERSEA_CONTINUOUS_INFO
+      (excd, symb, updown, continuous, stckClpr, basedate)
+      VALUES
+      ('${item.excd}', '${item.symb}', '${item.updown ?? 'null'}', ${
+        item.continuous ?? 'null'
+      }, ${item.stckClpr ?? 'null'}, '${item.basedate ?? 'null'}')
+    ON DUPLICATE KEY UPDATE
+      updown = VALUES(updown),
+      continuous = VALUES(continuous),
+      stckClpr = VALUES(stckClpr),
+      basedate = VALUES(basedate);
+  `;
 
       await exeQuery(sql).catch((e) => {
         console.log(`'${item.excd}', '${item.symb}' insert failed`);

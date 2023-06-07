@@ -38,16 +38,23 @@ export async function mergeList(
   try {
     for (const item of itemList) {
       const sql = `
-      INSERT INTO TRADING_MARKETS_OPEN_DATE (prdt_type_cd, tr_natn_cd, tr_natn_name, natn_eng_abrv_cd, tr_mket_cd, tr_mket_name, acpl_sttl_dt, dmst_sttl_dt, baseymd)
-      VALUES ('${item.prdt_type_cd}', '${item.tr_natn_cd}', '${item.tr_natn_name}', '${item.natn_eng_abrv_cd}', '${item.tr_mket_cd}', '${item.tr_mket_name}', '${item.acpl_sttl_dt}', '${item.dmst_sttl_dt}', '${item.baseymd}')
-      ON DUPLICATE KEY UPDATE
-          prdt_type_cd = '${item.prdt_type_cd}',
-          tr_natn_cd = '${item.tr_natn_cd}',
-          tr_natn_name = '${item.tr_natn_name}',
-          tr_mket_cd = '${item.tr_mket_cd}',
-          tr_mket_name = '${item.tr_mket_name}',
-          acpl_sttl_dt = '${item.acpl_sttl_dt}',
-          dmst_sttl_dt = '${item.dmst_sttl_dt}';
+    INSERT INTO TRADING_MARKETS_OPEN_DATE
+      (prdt_type_cd, tr_natn_cd, tr_natn_name, natn_eng_abrv_cd, tr_mket_cd, tr_mket_name, acpl_sttl_dt, dmst_sttl_dt, baseymd)
+      VALUES
+      ('${item.prdt_type_cd ?? 'null'}', '${item.tr_natn_cd ?? 'null'}', '${
+        item.tr_natn_name ?? 'null'
+      }', '${item.natn_eng_abrv_cd ?? 'null'}',
+       '${item.tr_mket_cd ?? 'null'}', '${item.tr_mket_name ?? 'null'}', '${
+        item.acpl_sttl_dt ?? 'null'
+      }', '${item.dmst_sttl_dt ?? 'null'}', '${item.baseymd ?? 'null'}')
+    ON DUPLICATE KEY UPDATE
+      prdt_type_cd = '${item.prdt_type_cd ?? 'null'}',
+      tr_natn_cd = '${item.tr_natn_cd ?? 'null'}',
+      tr_natn_name = '${item.tr_natn_name ?? 'null'}',
+      tr_mket_cd = '${item.tr_mket_cd ?? 'null'}',
+      tr_mket_name = '${item.tr_mket_name ?? 'null'}',
+      acpl_sttl_dt = '${item.acpl_sttl_dt ?? 'null'}',
+      dmst_sttl_dt = '${item.dmst_sttl_dt ?? 'null'}';
         `;
       await exeQuery(sql).catch((e) => {
         console.log(
