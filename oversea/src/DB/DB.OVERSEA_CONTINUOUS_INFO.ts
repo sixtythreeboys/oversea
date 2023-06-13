@@ -20,6 +20,7 @@ export async function mergeList(
 ): Promise<boolean> {
   try {
     for (const item of itemList) {
+      console.log(item);
       const sql = `
     INSERT INTO OVERSEA_CONTINUOUS_INFO
       (excd, symb, updown, continuous, stckClpr, basedate)

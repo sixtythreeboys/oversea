@@ -23,7 +23,6 @@ import {
 } from 'src/common/util/dateUtils';
 
 import { writeFileSync, appendFileSync } from 'fs';
-import { tempData } from './temp';
 
 @Injectable()
 export class BatchService {
@@ -44,9 +43,11 @@ export class BatchService {
           getToday(),
         );
         for (const date of dateList) {
-          this.updateUpDown(date).catch((e) => console.log(e));
+          await this.updateUpDown(date)
+            .then(() => console.log(`updateUpDown updated at ${date}`))
+            .catch((e) => console.log(e));
         }
-      })();
+      }.call(this));
       (async function () {
         const dateList = getDateList(
           await OVERSEA_HHDFS76240000_getLastDay(),
@@ -55,16 +56,29 @@ export class BatchService {
         for (const date of dateList) {
           this.updateDetailInfo(date).catch((e) => console.log(e));
         }
-      });
+      }.call(this));
       this.updateTradingDate(getToday()).catch((e) => console.log(e));
     });
     this.job.start();
+
+    //(async function () {
+    //   const dateList = getDateList(
+    //     await OVERSEA_CONTINUOUS_INFO_getLastDay(),
+    //     getToday(),
+    //   );
+    //   for (const date of dateList) {
+    //     console.log(date);
+    //     await this.updateUpDown(date)
+    //       .then(() => console.log(`updateUpDown updated at ${date}`))
+    //       .catch((e) => console.log(e));
+    //   }
+    // }.call(this));
 
     //this.updateTradingDate(getToday());
   }
   async updateTradingDate(basedate) {
     const recvData = await APIS.CTOS5011R({ TRAD_DT: basedate });
-    if (await TRADING_MARKETS_OPEN_DATE_merge(recvData.data)) {
+    if (await TRADING_MARKETS_OPEN_DATE_merge(recvData.data, basedate)) {
       console.log(
         `${recvData.data.length} items inserted into TRADING_MARKETS_OPEN_DATE.`,
       );
@@ -74,53 +88,62 @@ export class BatchService {
     }
   }
   async updateUpDown(basedate) {
-    const itemList: any[] = await getItemList();
+    let itemList: any[] = await getItemList();
     const updateData = [];
-    for (const item of itemList) {
-      const [continuousData, recvData] = await Promise.all([
-        getData(item.excd, item.symb),
-        APIS.HHDFS76240000(
-          {
-            EXCD: item.excd,
-            SYMB: item.symb,
-            GUBN: '0',
-            BYMD: basedate,
-          } as any,
-          1,
-        )
-          .then((detail: any) => (detail.length > 0 ? detail[0] : null))
-          .catch((e) => {
-            console.log(e);
-            return null;
-          }),
-      ]);
-      if (recvData === null) {
-        return;
-      }
-      if (continuousData.updown === 'D') {
-        if (parseFloat(recvData.rate) >= 0) {
-          continuousData.continuous =
-            continuousData.continuous > 0 ? continuousData.continuous + 1 : 1;
-        } else if (parseFloat(recvData.rate) < 0) {
-          continuousData.continuous = 1;
-          continuousData.updown = 'U';
+    itemList = await Promise.all(
+      itemList.map(async (item) => {
+        const [continuousData, recvData] = await Promise.all([
+          getData(item.excd, item.symb),
+          APIS.HHDFS76240000(
+            {
+              EXCD: item.excd,
+              SYMB: item.symb,
+              GUBN: '0',
+              BYMD: basedate,
+            } as any,
+            1,
+          )
+            .then((detail: any) => (detail.length > 0 ? detail[0] : null))
+            .catch((e) => {
+              console.log(e);
+              return null;
+            }),
+        ]);
+        if (recvData === null) {
+          return null;
         }
-      } else if (continuousData.updown === 'U') {
-        if (parseFloat(recvData.rate) <= 0) {
-          continuousData.continuous =
-            continuousData.continuous > 0 ? continuousData.continuous + 1 : 1;
-        } else if (parseFloat(recvData.rate) > 0) {
-          continuousData.continuous = 1;
-          continuousData.updown = 'D';
+        if (continuousData.updown === 'D') {
+          if (parseFloat(recvData.rate) >= 0) {
+            continuousData.continuous =
+              continuousData.continuous > 0 ? continuousData.continuous + 1 : 1;
+          } else if (parseFloat(recvData.rate) < 0) {
+            continuousData.continuous = 1;
+            continuousData.updown = 'U';
+          }
+        } else if (continuousData.updown === 'U') {
+          if (parseFloat(recvData.rate) <= 0) {
+            continuousData.continuous =
+              continuousData.continuous > 0 ? continuousData.continuous + 1 : 1;
+          } else if (parseFloat(recvData.rate) > 0) {
+            continuousData.continuous = 1;
+            continuousData.updown = 'D';
+          }
         }
-      }
-      continuousData.stckClpr = recvData.clos;
-      continuousData.basedate = basedate;
-      updateData.push(continuousData);
-    }
-    if (await OVERSEA_CONTINUOUS_INFO_merge(updateData)) {
+        continuousData.stckClpr = recvData.clos;
+        continuousData.basedate = basedate;
+        console.log(item.symb);
+        return continuousData;
+      }),
+    );
+    itemList = itemList.filter((e) => e);
+    if (await OVERSEA_CONTINUOUS_INFO_merge(itemList)) {
       console.log(
-        `${updateData.length} items inserted into OVERSEA_CONTINUOUS_INFO.`,
+        `${itemList.length} items inserted into OVERSEA_CONTINUOUS_INFO.`,
+      );
+      writeFileSync(
+        'output',
+        `${basedate} ${itemList.length} items inserted into OVERSEA_CONTINUOUS_INFO.`,
+        'utf8',
       );
       dbModel.connection.commit();
     } else {

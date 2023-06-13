@@ -76,10 +76,10 @@ export async function mergeList(
 export async function getNasOpenList(startdate, period) {
   try {
     const sql = `
-select acpl_sttl_dt
+select DATE_FORMAT(acpl_sttl_dt, '%Y%m%d') AS acpl_sttl_dt
   from TRADING_MARKETS_OPEN_DATE
  where tr_mket_name = '나스닥'
-   and acpl_sttl_dt < '${startdate.substring(0, 4)}-${startdate.substring(
+   and acpl_sttl_dt <= '${startdate.substring(0, 4)}-${startdate.substring(
       4,
       6,
     )}-${startdate.substring(6, 8)}
@@ -87,7 +87,7 @@ select acpl_sttl_dt
       `;
 
     const days = await exeQuery(sql)
-      .then((e: any) => e.acpl_sttl_dt)
+      .then((e: any) => e.map((e) => e.acpl_sttl_dt))
       .catch((e) => {
         console.log(`'getLastDay failed`);
       });

@@ -6,6 +6,7 @@ import { getItemByKey, getItemList } from 'src/DB/DB.OVERSEA_ITEM_MAST';
 import { getDataByOption } from 'src/DB/DB.OVERSEA_CONTINUOUS_INFO';
 import { getDataByDateList } from 'src/DB/DB.OVERSEA_HHDFS76240000';
 import { generateDateList, getToday } from 'src/common/util/dateUtils';
+import { getNasOpenList } from 'src/DB/DB.TRADING_MARKETS_OPEN_DATE';
 
 export const markets: Markets[] = [
   'NYS',
@@ -144,11 +145,17 @@ export class OverseaService {
         const details = await getDataByDateList(
           item.excd,
           item.symb,
-          generateDateList(getToday(), period),
+          await getNasOpenList(getToday(), period),
         );
-        console.log(details);
         return { excd: item.excd, symb: item.symb, details };
       }),
+    ).then((e) =>
+      e
+        .filter((e: any) => !Object.values(e.details).includes(null))
+        .map((e) => {
+          e.details = Object.values(e.details);
+          return e;
+        }),
     )) as [];
     itemList = (await Promise.all(
       itemList.map(async (item: { excd; symb; details }) => {
@@ -168,7 +175,6 @@ export class OverseaService {
         return res;
       }),
     )) as [];
-
     return { status: 200, data: itemList };
   }
   async getDetail_v1({ EXCD, 종목코드, 기간분류코드, period }) {
