@@ -49,73 +49,53 @@ export const services = {
   },
   //키값이 겹칠경우 UPDATE, 아니면 INSERT
   async mergeList(itemList: OVERSEA_CONTINUOUS_INFO[]): Promise<boolean> {
-    try {
-      for (const item of itemList) {
-        console.log(item);
-        const sql = `
-      INSERT INTO OVERSEA_CONTINUOUS_INFO
-        (excd, symb, updown, continuous, stckClpr, basedate)
-        VALUES
-        ('${item.excd}', '${item.symb}', '${item.updown ?? 'null'}', ${
-          item.continuous ?? 'null'
-        }, ${item.stckClpr ?? 'null'}, '${item.basedate ?? 'null'}')
-      ON DUPLICATE KEY UPDATE
-        updown = VALUES(updown),
-        continuous = VALUES(continuous),
-        stckClpr = VALUES(stckClpr),
-        basedate = VALUES(basedate);
-    `;
+    for (const item of itemList) {
+      console.log(item);
+      const sql = `
+    INSERT INTO OVERSEA_CONTINUOUS_INFO
+      (excd, symb, updown, continuous, stckClpr, basedate)
+      VALUES
+      ('${item.excd}', '${item.symb}', '${item.updown ?? 'null'}', ${
+        item.continuous ?? 'null'
+      }, ${item.stckClpr ?? 'null'}, '${item.basedate ?? 'null'}')
+    ON DUPLICATE KEY UPDATE
+      updown = VALUES(updown),
+      continuous = VALUES(continuous),
+      stckClpr = VALUES(stckClpr),
+      basedate = VALUES(basedate);
+  `;
 
-        await exeQuery(sql).catch((e) => {
-          console.log(`'${item.excd}', '${item.symb}' insert failed`);
-        });
-      }
-
-      return true;
-    } catch (err) {
-      dbModel.connection.rollback(function () {
-        throw err;
+      await exeQuery(sql).catch((e) => {
+        console.log(`'${item.excd}', '${item.symb}' insert failed`);
       });
     }
+
+    return true;
   },
   // 가장 최근 갱신일을 저장
   async getLastDay() {
-    try {
-      const sql = `
+    const sql = `
           SELECT MIN(basedate) as lastD
             FROM OVERSEA_CONTINUOUS_INFO;
         `;
 
-      const lastday = await exeQuery(sql).catch((e) => {
-        console.log(`'getLastDay failed`);
-      });
-      return lastday[0].lastD;
-    } catch (err) {
-      dbModel.connection.rollback(function () {
-        throw err;
-      });
-      return null;
-    }
+    const lastday = await exeQuery(sql).catch((e) => {
+      console.log(`'getLastDay failed`);
+    });
+    return lastday[0].lastD;
   },
   // 특정 아이템 검색
   async getData(excd, symb) {
-    try {
-      const sql = ` 
+    const sql = ` 
           select updown, continuous, stckClpr, basedate
             from OVERSEA_CONTINUOUS_INFO oci
            where excd = '${excd}'
              and symb = '${symb}';
            `;
 
-      const lastday = await exeQuery(sql).catch((e) => {
-        console.log(`'getLastDay failed`);
-      });
-      return lastday[0];
-    } catch (err) {
-      dbModel.connection.rollback(function () {
-        throw err;
-      });
-      return null;
-    }
+    const lastday = await exeQuery(sql).catch((e) => {
+      console.log(`'getLastDay failed`);
+    });
+    return lastday[0];
   },
 };

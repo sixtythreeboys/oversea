@@ -53,68 +53,55 @@ export const services = {
     }
   },
   async getLastDay() {
-    try {
-      const sql = `
+    const sql = `
           SELECT MAX(basedate) as lastD
             FROM OVERSEA_HHDFS76240000;
         `;
 
-      const lastday = await exeQuery(sql).catch((e) => {
-        console.log(`'getLastDay failed`);
-      });
-      return lastday[0].lastD;
-    } catch (err) {
-      dbModel.connection.rollback(function () {
-        throw err;
-      });
-      return null;
-    }
+    const lastday = await exeQuery(sql).catch((e) => {
+      console.log(`'getLastDay failed`);
+    });
+    return lastday[0].lastD;
   },
   async mergeList(itemList: OVERSEA_HHDFS76240000[]): Promise<boolean> {
-    try {
-      for (const item of itemList) {
-        const sql = `
-          INSERT INTO OVERSEA_HHDFS76240000
-            (excd, symb, xymd, clos, sign, diff, rate, \`open\`, high, low, tvol, tamt, pbid, vbid, pask, vask)
-            VALUES
-            ('${item.excd}', '${item.symb}', '${item.xymd}', ${
-          item.clos ?? 'null'
-        }, '${item.sign ?? 'null'}', ${item.diff ?? 'null'}, '${
-          item.rate ?? 'null'
-        }',
-             ${item.open ?? 'null'}, ${item.high ?? 'null'}, ${
-          item.low ?? 'null'
-        }, ${item.tvol ?? 'null'}, ${item.tamt ?? 'null'},
-             ${item.pbid ?? 'null'}, ${item.vbid ?? 'null'}, ${
-          item.pask ?? 'null'
-        }, ${item.vask ?? 'null'})
-          ON DUPLICATE KEY UPDATE
-            clos = VALUES(clos),
-            sign = VALUES(sign),
-            diff = VALUES(diff),
-            rate = VALUES(rate),
-            \`open\` = VALUES(\`open\`),
-            high = VALUES(high),
-            low = VALUES(low),
-            tvol = VALUES(tvol),
-            tamt = VALUES(tamt),
-            pbid = VALUES(pbid),
-            vbid = VALUES(vbid),
-            pask = VALUES(pask),
-            vask = VALUES(vask);
-        `;
-        await exeQuery(sql).catch((e) => {
-          console.log(
-            `'${item.excd}', '${item.symb}', '${item.xymd}' insert failed`,
-          );
-        });
-      }
-
-      return true;
-    } catch (err) {
-      dbModel.connection.rollback(function () {
-        throw err;
+    for (const item of itemList) {
+      const sql = `
+        INSERT INTO OVERSEA_HHDFS76240000
+          (excd, symb, xymd, clos, sign, diff, rate, \`open\`, high, low, tvol, tamt, pbid, vbid, pask, vask)
+          VALUES
+          ('${item.excd}', '${item.symb}', '${item.xymd}', ${
+        item.clos ?? 'null'
+      }, '${item.sign ?? 'null'}', ${item.diff ?? 'null'}, '${
+        item.rate ?? 'null'
+      }',
+           ${item.open ?? 'null'}, ${item.high ?? 'null'}, ${
+        item.low ?? 'null'
+      }, ${item.tvol ?? 'null'}, ${item.tamt ?? 'null'},
+           ${item.pbid ?? 'null'}, ${item.vbid ?? 'null'}, ${
+        item.pask ?? 'null'
+      }, ${item.vask ?? 'null'})
+        ON DUPLICATE KEY UPDATE
+          clos = VALUES(clos),
+          sign = VALUES(sign),
+          diff = VALUES(diff),
+          rate = VALUES(rate),
+          \`open\` = VALUES(\`open\`),
+          high = VALUES(high),
+          low = VALUES(low),
+          tvol = VALUES(tvol),
+          tamt = VALUES(tamt),
+          pbid = VALUES(pbid),
+          vbid = VALUES(vbid),
+          pask = VALUES(pask),
+          vask = VALUES(vask);
+      `;
+      await exeQuery(sql).catch((e) => {
+        console.log(
+          `'${item.excd}', '${item.symb}', '${item.xymd}' insert failed`,
+        );
       });
     }
+
+    return true;
   },
 };

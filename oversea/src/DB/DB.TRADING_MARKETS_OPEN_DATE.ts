@@ -16,22 +16,15 @@ export type TRADING_MARKETS_OPEN_DATE = {
 };
 export const services = {
   async getLastDay() {
-    try {
-      const sql = `
+    const sql = `
           SELECT MAX(baseymd) as lastD
             FROM TRADING_MARKETS_OPEN_DATE;
         `;
 
-      const lastday = await exeQuery(sql).catch((e) => {
-        console.log(`'getLastDay failed`);
-      });
-      return lastday[0].lastD;
-    } catch (err) {
-      dbModel.connection.rollback(function () {
-        throw err;
-      });
-      return null;
-    }
+    const lastday = await exeQuery(sql).catch((e) => {
+      console.log(`'getLastDay failed`);
+    });
+    return lastday[0].lastD;
   },
   async mergeList(
     itemList: TRADING_MARKETS_OPEN_DATE[],
@@ -62,7 +55,6 @@ export const services = {
           `'${item.natn_eng_abrv_cd}', '${item.baseymd}' insert failed`,
         );
       });
-
     }
     return true;
   },
@@ -72,17 +64,17 @@ export const services = {
     from TRADING_MARKETS_OPEN_DATE
    where tr_mket_name = '나스닥'
      and acpl_sttl_dt <= '${startdate.substring(0, 4)}-${startdate.substring(
-        4,
-        6,
-      )}-${startdate.substring(6, 8)}
+      4,
+      6,
+    )}-${startdate.substring(6, 8)}
    order byacpl_sttl_dt';
         `;
 
-      const days = await exeQuery(sql)
-        .then((e: any) => e.map((e) => e.acpl_sttl_dt))
-        .catch((e) => {
-          console.log(`'getLastDay failed`);
-        });
-      return days.slice(days.length - period, days.length);
+    const days = await exeQuery(sql)
+      .then((e: any) => e.map((e) => e.acpl_sttl_dt))
+      .catch((e) => {
+        console.log(`'getLastDay failed`);
+      });
+    return days.slice(days.length - period, days.length);
   },
 };
