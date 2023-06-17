@@ -98,3 +98,15 @@ export function makeWSdata(body: any) {
     },
   };
 }
+
+export const markets: Markets[] = [
+  'NYS',
+  'NAS',
+  'AMS',
+  'TSE',
+  'HKS',
+  'SHS',
+  'SZS',
+  'HSX',
+  'HNX',
+];

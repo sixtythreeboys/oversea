@@ -1,27 +1,30 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { apply as eureka } from './common/eureka';
+import { apply as EUREKA } from '../src/eureka/eureka';
+import { init as DB } from 'src/DB/DB.service';
+import { init as KISWS } from 'src/KIS/KISWS';
 import config from 'config';
-import { init as DBinit } from 'src/DB/DB.service';
-import { init as KISWSinit } from 'src/KIS/KISWS';
 
 async function init() {
-  try {
-    await DBinit();
-  } catch (e) {
-    console.log('DB connect failed');
-  }
-  try {
-    await KISWSinit();
-  } catch (e) {
-    console.log('KISWS connect failed');
-  }
+  const initList = { KISWS }; //{ EUREKA, DB, KISWS };
+  await Promise.all(
+    Object.keys(initList).map(async (service) => {
+      try {
+        await initList[service]();
+        console.log(`service inited : ${service}`);
+      } catch (e) {
+        console.log(`service init failed : ${service}`);
+      }
+
+      return true;
+    }),
+  );
+  return true;
 }
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   await init();
   await app.listen(config.APP.PORT);
-  eureka();
 }
 bootstrap();

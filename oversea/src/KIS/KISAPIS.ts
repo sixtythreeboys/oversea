@@ -6,7 +6,7 @@ import {
   makeHeader,
   CTOS5011R,
 } from '../oversea/oversea.type';
-import { enqueue } from 'src/common/util/delayingQueue';
+import { enqueue } from 'src/KIS/delayingQueue';
 import { getToday } from 'src/common/util/dateUtils';
 
 export const APICallers = {

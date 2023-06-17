@@ -14,103 +14,108 @@ export class OVERSEA_CONTINUOUS_INFO {
     this.symb = symb;
   }
 }
-
-export async function mergeList(
-  itemList: OVERSEA_CONTINUOUS_INFO[],
-): Promise<boolean> {
-  try {
-    for (const item of itemList) {
-      console.log(item);
-      const sql = `
-    INSERT INTO OVERSEA_CONTINUOUS_INFO
-      (excd, symb, updown, continuous, stckClpr, basedate)
-      VALUES
-      ('${item.excd}', '${item.symb}', '${item.updown ?? 'null'}', ${
-        item.continuous ?? 'null'
-      }, ${item.stckClpr ?? 'null'}, '${item.basedate ?? 'null'}')
-    ON DUPLICATE KEY UPDATE
-      updown = VALUES(updown),
-      continuous = VALUES(continuous),
-      stckClpr = VALUES(stckClpr),
-      basedate = VALUES(basedate);
-  `;
-
-      await exeQuery(sql).catch((e) => {
-        console.log(`'${item.excd}', '${item.symb}' insert failed`);
-      });
-    }
-
-    return true;
-  } catch (err) {
-    dbModel.connection.rollback(function () {
-      throw err;
-    });
-  }
-}
-
-export async function getLastDay() {
-  try {
-    const sql = `
-        SELECT MIN(basedate) as lastD
-          FROM OVERSEA_CONTINUOUS_INFO;
-      `;
-
-    const lastday = await exeQuery(sql).catch((e) => {
-      console.log(`'getLastDay failed`);
-    });
-    return lastday[0].lastD;
-  } catch (err) {
-    dbModel.connection.rollback(function () {
-      throw err;
-    });
-    return null;
-  }
-}
-
-export async function getData(excd, symb) {
-  try {
-    const sql = ` 
-        select updown, continuous, stckClpr, basedate
-          from OVERSEA_CONTINUOUS_INFO oci
-         where excd = '${excd}'
-           and symb = '${symb}';
-         `;
-
-    const lastday = await exeQuery(sql).catch((e) => {
-      console.log(`'getLastDay failed`);
-    });
-    return lastday[0];
-  } catch (err) {
-    dbModel.connection.rollback(function () {
-      throw err;
-    });
-    return null;
-  }
-}
-
-export async function getDataByOption(period: number, avlsScal: number) {
-  try {
+export const services = {
+  // 조건검색
+  async getDataByOption(data: { period: number; avlsScal: number }) {
+    const { period, avlsScal } = data;
+    const conditions = [
+      (() => {
+        if (period === 0) {
+          return null;
+        } else if (period > 0) {
+          return `continuous >= ${period}`;
+        } else {
+          return `continuous <= ${period}`;
+        }
+      })(),
+      (() => {
+        if (avlsScal === 0) {
+          return null;
+        } else if (avlsScal > 0) {
+          return `CONVERT(stckClpr, FLOAT) >= ${Math.abs(avlsScal)}`;
+        } else {
+          return `CONVERT(stckClpr, FLOAT) <= ${Math.abs(avlsScal)}`;
+        }
+      })(),
+    ].filter((e) => e !== null);
     const sql = ` 
     select excd, symb
       from OVERSEA_CONTINUOUS_INFO oci
-     where continuous >= ${Math.abs(period)}
-       and CONVERT(stckClpr, FLOAT) ${
-         avlsScal === 0
-           ? 'is not null'
-           : avlsScal < 0
-           ? `<= ${Math.abs(avlsScal)}`
-           : `>= ${Math.abs(avlsScal)}`
-       } 
-       and updown ${
-         period === 0 ? 'is not null' : period > 0 ? `= 'U'` : `= 'D'`
-       };
+     where ${[' 1=1 ', ...conditions].join(' and ')};
       `;
-    const recvData = await exeQuery(sql).catch((e) => {
-      console.log(`'getLastDay failed`);
-    });
+
+    const recvData = sql; //await exeQuery(sql);
     return recvData;
-  } catch (err) {
-    console.log(err);
-    return null;
-  }
-}
+  },
+  //키값이 겹칠경우 UPDATE, 아니면 INSERT
+  async mergeList(itemList: OVERSEA_CONTINUOUS_INFO[]): Promise<boolean> {
+    try {
+      for (const item of itemList) {
+        console.log(item);
+        const sql = `
+      INSERT INTO OVERSEA_CONTINUOUS_INFO
+        (excd, symb, updown, continuous, stckClpr, basedate)
+        VALUES
+        ('${item.excd}', '${item.symb}', '${item.updown ?? 'null'}', ${
+          item.continuous ?? 'null'
+        }, ${item.stckClpr ?? 'null'}, '${item.basedate ?? 'null'}')
+      ON DUPLICATE KEY UPDATE
+        updown = VALUES(updown),
+        continuous = VALUES(continuous),
+        stckClpr = VALUES(stckClpr),
+        basedate = VALUES(basedate);
+    `;
+
+        await exeQuery(sql).catch((e) => {
+          console.log(`'${item.excd}', '${item.symb}' insert failed`);
+        });
+      }
+
+      return true;
+    } catch (err) {
+      dbModel.connection.rollback(function () {
+        throw err;
+      });
+    }
+  },
+  // 가장 최근 갱신일을 저장
+  async getLastDay() {
+    try {
+      const sql = `
+          SELECT MIN(basedate) as lastD
+            FROM OVERSEA_CONTINUOUS_INFO;
+        `;
+
+      const lastday = await exeQuery(sql).catch((e) => {
+        console.log(`'getLastDay failed`);
+      });
+      return lastday[0].lastD;
+    } catch (err) {
+      dbModel.connection.rollback(function () {
+        throw err;
+      });
+      return null;
+    }
+  },
+  // 특정 아이템 검색
+  async getData(excd, symb) {
+    try {
+      const sql = ` 
+          select updown, continuous, stckClpr, basedate
+            from OVERSEA_CONTINUOUS_INFO oci
+           where excd = '${excd}'
+             and symb = '${symb}';
+           `;
+
+      const lastday = await exeQuery(sql).catch((e) => {
+        console.log(`'getLastDay failed`);
+      });
+      return lastday[0];
+    } catch (err) {
+      dbModel.connection.rollback(function () {
+        throw err;
+      });
+      return null;
+    }
+  },
+};

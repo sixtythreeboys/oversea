@@ -26,23 +26,23 @@ export interface OVERSEA_ITEM_MAST {
   etyp: string | null; // ETF/ETN/ETC/... type
   ttyp_sb: string | null; // Tick size type 상세 (used when ttyp=9): 런던 제트라 유로넥스트
 }
-
-export async function getItemList(): Promise<{ excd; symb }[]> {
-  return exeQuery(
-    `select distinct excd, symb from OVERSEA_ITEM_MAST;`,
-  ) as Promise<{ excd; symb }[]>;
-}
-
-export async function getItemByKey(excd, symb) {
-  const res = await exeQuery(
-    `select ncod,exid,excd,exnm,symb,rsym,knam,enam,stis,curr,zdiv,ztyp,base,bnit,anit,mstm,metm,isdr,drcd,icod,sjong,ttyp,etyp,ttyp_sb
-       from OVERSEA_ITEM_MAST
-      where excd = '${excd}'
-        and symb = '${symb}';`,
-  );
-  try {
-    return res[0];
-  } catch (e) {
-    return null;
-  }
-}
+export const services = {
+  async getItemList(): Promise<{ excd; symb }[]> {
+    return exeQuery(
+      `select distinct excd, symb from OVERSEA_ITEM_MAST;`,
+    ) as Promise<{ excd; symb }[]>;
+  },
+  async getItemByKey(excd, symb) {
+    const res = await exeQuery(
+      `select ncod,exid,excd,exnm,symb,rsym,knam,enam,stis,curr,zdiv,ztyp,base,bnit,anit,mstm,metm,isdr,drcd,icod,sjong,ttyp,etyp,ttyp_sb
+         from OVERSEA_ITEM_MAST
+        where excd = '${excd}'
+          and symb = '${symb}';`,
+    );
+    try {
+      return res[0];
+    } catch (e) {
+      return null;
+    }
+  },
+};

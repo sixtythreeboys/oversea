@@ -1,4 +1,4 @@
-import _CONFIG from '../../../config';
+import _CONFIG from '../../config';
 import { Queue } from 'src/common/type';
 
 export const CONFIG = _CONFIG.COMMON.delayingQueue;
