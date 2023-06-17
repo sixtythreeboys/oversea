@@ -18,6 +18,8 @@ export async function exeQuery(query: string) {
   return new Promise((resolve, reject) => {
     dbModel.connection.query(query, (error, results, fields) => {
       if (error) {
+        console.log('query exe error : ');
+        console.log(query);
         dbModel.connection.rollback(function () {
           reject(error);
         });
