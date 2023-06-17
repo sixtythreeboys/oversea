@@ -41,6 +41,7 @@ export function addOneDay(date: string): string {
 }
 
 export function getDateList(start, end) {
+  console.log(start, end)
   const res = [];
   [start, end] = [addOneDay(start), addOneDay(end)];
   for (let day = start; day !== end; day = addOneDay(day)) {

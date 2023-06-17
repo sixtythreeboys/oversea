@@ -1,12 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { apply as EUREKA } from '../src/eureka/eureka';
+import { init as COMMON } from './common/init';
 import { init as DB } from 'src/DB/DB.service';
 import { init as KISWS } from 'src/KIS/KISWS';
 import config from 'config';
 
 async function init() {
-  const initList = { KISWS }; //{ EUREKA, DB, KISWS };
+  const initList = { KISWS, DB, COMMON }; //{ EUREKA, DB, KISWS, COMMON };
   await Promise.all(
     Object.keys(initList).map(async (service) => {
       try {

@@ -6,19 +6,17 @@ import { writeFileSync } from 'fs';
 
 export async function updateTradingDate(basedate) {
   const recvData = await APIS.CTOS5011R({ TRAD_DT: basedate });
-  writeFileSync(
-    'src/oversea/batch/' + basedate,
-    JSON.stringify(recvData, null, 2),
-    'utf8',
-  );
   TRADING_MARKETS_OPEN_DATE.mergeList(recvData.data, basedate).then((e) => {
-    console.log();
+    console.log(`TRADING_MARKETS_OPEN_DATE ( ${basedate} ) updated`);
+  }).catch(err=>
+    {
+      console.log(`TRADING_MARKETS_OPEN_DATE ( ${basedate} ) updated`);
   });
 }
 
 export async function fillEmpty(today) {
   const dateList = getDateList(
-    '20230608', //await TRADING_MARKETS_OPEN_DATE.getLastDay(),
+    await TRADING_MARKETS_OPEN_DATE.getLastDay(),
     today,
   );
   for (const date of dateList) {

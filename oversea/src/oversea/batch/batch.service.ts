@@ -18,19 +18,7 @@ export class BatchService {
   }
   async moduleInit() {
     await updateToken();
-    // Access and use the MyService within the initialization logic
-    this.job = new CronJob('0 0 1 * * *', async () => {
-      const TODAY = getToday();
-      fill_updateTradingDate(TODAY);
-      (async function () {
-        const dateList = getDateList(
-          await OVERSEA_HHDFS76240000.getLastDay(),
-          getToday(),
-        );
-        for (const date of dateList) {
-          this.updateDetailInfo(date).catch((e) => console.log(e));
-        }
-      }.call(this));
+    this.job = new CronJob('0 0 1 * * *', async () => { // 매일 1시 실행
     });
     this.job.start();
   }
