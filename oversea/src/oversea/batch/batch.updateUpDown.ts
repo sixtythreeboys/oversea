@@ -1,7 +1,6 @@
 import { services as OVERSEA_ITEM_MAST } from 'src/DB/DB.OVERSEA_ITEM_MAST';
 import { services as OVERSEA_CONTINUOUS_INFO } from 'src/DB/DB.OVERSEA_CONTINUOUS_INFO';
 import { APIS } from 'src/KIS/KISAPIS';
-import { writeFileSync } from 'fs';
 import { dbModel } from 'src/DB/DB.model';
 
 export async function updateUpDown(basedate) {
@@ -56,11 +55,6 @@ export async function updateUpDown(basedate) {
   if (await OVERSEA_CONTINUOUS_INFO.mergeList(itemList)) {
     console.log(
       `${itemList.length} items inserted into OVERSEA_CONTINUOUS_INFO.`,
-    );
-    writeFileSync(
-      'output',
-      `${basedate} ${itemList.length} items inserted into OVERSEA_CONTINUOUS_INFO.`,
-      'utf8',
     );
     dbModel.connection.commit();
   } else {

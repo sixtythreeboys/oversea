@@ -18,7 +18,7 @@ export const services = {
   async getLastDay() {
     try {
       const sql = `
-          SELECT MAX(basedate) as lastD
+          SELECT MAX(baseymd) as lastD
             FROM TRADING_MARKETS_OPEN_DATE;
         `;
 
@@ -58,13 +58,12 @@ export const services = {
         dmst_sttl_dt = '${item.dmst_sttl_dt ?? 'null'}';
           `;
 
-        // await exeQuery(sql).catch((e) => {
-        //   console.log(
-        //     `'${item.natn_eng_abrv_cd}', '${item.baseymd}' insert failed`,
-        //   );
-        // });
+        await exeQuery(sql).catch((e) => {
+          console.log(
+            `'${item.natn_eng_abrv_cd}', '${item.baseymd}' insert failed`,
+          );
+        });
 
-        appendFileSync('src/oversea/batch/' + basedate, sql, 'utf8');
       }
 
       return true;
