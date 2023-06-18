@@ -24,7 +24,7 @@ export const services = {
     const lastday = await exeQuery(sql).catch((e) => {
       console.log(`'getLastDay failed`);
     });
-    return lastday[0].lastD;
+    return lastday[0] ? lastday[0].lastD : null;
   },
   async mergeList(
     itemList: TRADING_MARKETS_OPEN_DATE[],
@@ -58,23 +58,47 @@ export const services = {
     }
     return true;
   },
-  async getNasOpenList(startdate, period) {
+  async getNasOpenList(startdate, period?) {
+    if (period) {
+      const sql = `
+    select DATE_FORMAT(acpl_sttl_dt, '%Y%m%d') AS acpl_sttl_dt
+      from TRADING_MARKETS_OPEN_DATE
+     where tr_mket_name = '나스닥'
+       and DATE_FORMAT(acpl_sttl_dt, '%Y%m%d') <= '${startdate}'
+     order by acpl_sttl_dt desc
+     limit ${period};
+          `;
+
+      let days = await exeQuery(sql).then((e: any) =>
+        e.map((e) => e.acpl_sttl_dt),
+      );
+      days = days.slice(days.length - period, days.length);
+      days.sort();
+      return days;
+    } else {
+      const sql = `
+    select DATE_FORMAT(acpl_sttl_dt, '%Y%m%d') AS acpl_sttl_dt
+      from TRADING_MARKETS_OPEN_DATE
+     where tr_mket_name = '나스닥'
+       and DATE_FORMAT(acpl_sttl_dt, '%Y%m%d') > '${startdate}'
+     order by acpl_sttl_dt`;
+
+      let days = await exeQuery(sql).then((e: any) =>
+        e.map((e) => e.acpl_sttl_dt),
+      );
+      return days;
+    }
+  },
+  async getMarketDate(basedate) {
     const sql = `
-  select DATE_FORMAT(acpl_sttl_dt, '%Y%m%d') AS acpl_sttl_dt
-    from TRADING_MARKETS_OPEN_DATE
-   where tr_mket_name = '나스닥'
-     and acpl_sttl_dt <= '${startdate.substring(0, 4)}-${startdate.substring(
-      4,
-      6,
-    )}-${startdate.substring(6, 8)}
-   order byacpl_sttl_dt';
+          SELECT acpl_sttl_dt as MarketDate
+            FROM TRADING_MARKETS_OPEN_DATE
+           WHERE baseymd = '${basedate}';
         `;
 
-    const days = await exeQuery(sql)
-      .then((e: any) => e.map((e) => e.acpl_sttl_dt))
-      .catch((e) => {
-        console.log(`'getLastDay failed`);
-      });
-    return days.slice(days.length - period, days.length);
+    const lastday = await exeQuery(sql).catch((e) => {
+      console.log(`'getMarketDate failed`);
+    });
+    return lastday[0] ? lastday[0].MarketDate : null;
   },
 };

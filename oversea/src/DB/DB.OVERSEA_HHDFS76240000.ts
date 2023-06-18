@@ -54,14 +54,14 @@ export const services = {
   },
   async getLastDay() {
     const sql = `
-          SELECT MAX(basedate) as lastD
+          SELECT MAX(xymd) as lastD
             FROM OVERSEA_HHDFS76240000;
         `;
 
     const lastday = await exeQuery(sql).catch((e) => {
       console.log(`'getLastDay failed`);
     });
-    return lastday[0].lastD;
+    return lastday[0] ? lastday[0].lastD : null;
   },
   async mergeList(itemList: OVERSEA_HHDFS76240000[]): Promise<boolean> {
     for (const item of itemList) {

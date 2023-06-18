@@ -53,13 +53,12 @@ export const services = {
       console.log(item);
       const sql = `
     INSERT INTO OVERSEA_CONTINUOUS_INFO
-      (excd, symb, updown, continuous, stckClpr, basedate)
+      (excd, symb, continuous, stckClpr, basedate)
       VALUES
-      ('${item.excd}', '${item.symb}', '${item.updown ?? 'null'}', ${
+      ('${item.excd}', '${item.symb}', ${
         item.continuous ?? 'null'
       }, ${item.stckClpr ?? 'null'}, '${item.basedate ?? 'null'}')
     ON DUPLICATE KEY UPDATE
-      updown = VALUES(updown),
       continuous = VALUES(continuous),
       stckClpr = VALUES(stckClpr),
       basedate = VALUES(basedate);
@@ -82,20 +81,22 @@ export const services = {
     const lastday = await exeQuery(sql).catch((e) => {
       console.log(`'getLastDay failed`);
     });
-    return lastday[0].lastD;
+    return lastday[0] ? lastday[0].lastD : null;
   },
   // 특정 아이템 검색
   async getData(excd, symb) {
     const sql = ` 
-          select updown, continuous, stckClpr, basedate
+          select excd, symb, continuous, stckClpr, basedate
             from OVERSEA_CONTINUOUS_INFO oci
            where excd = '${excd}'
              and symb = '${symb}';
            `;
 
-    const lastday = await exeQuery(sql).catch((e) => {
-      console.log(`'getLastDay failed`);
+    const recvData = await exeQuery(sql).catch((e) => {
+      console.log(`getData failed`);
+      return null;
     });
-    return lastday[0];
+    console.log(recvData);
+    return recvData[0] ? recvData[0] : null;
   },
 };
