@@ -4,65 +4,75 @@ import { exeQuery } from './DB.service';
 export class OVERSEA_CONTINUOUS_INFO {
   excd: string;
   symb: string;
-  updown?: string | null;
   continuous?: number | null;
   stckClpr?: number | null;
-  basedate?: string | null;
+  prdyAvlsScal?: number | null;
+  prdyCtrt?: number | null;
+  totalCtrt?: number | null;
+  htsKorIsnm?: string | null;
+  xymd: string;
 
-  constructor(excd: string, symb: string) {
+  constructor(excd: string, symb: string, xymd: string) {
     this.excd = excd;
     this.symb = symb;
+    this.xymd = xymd;
   }
 }
+
 export const services = {
-  // 조건검색
   async getDataByOption(data: { period: number; avlsScal: number }) {
     const { period, avlsScal } = data;
     const conditions = [
-      (() => {
-        if (period === 0) {
-          return null;
-        } else if (period > 0) {
-          return `continuous >= ${period}`;
-        } else {
-          return `continuous <= ${period}`;
-        }
-      })(),
+      (() =>
+        period === 0
+          ? `abs(continuous) = (
+        select MAX(abs(continuous))
+          from OVERSEA_CONTINUOUS_INFO B 
+         where A.excd = B.excd and A.symb = B.symb)`
+          : `continuous = ${period}`)(),
       (() => {
         if (avlsScal === 0) {
           return null;
         } else if (avlsScal > 0) {
-          return `CONVERT(stckClpr, FLOAT) >= ${Math.abs(avlsScal)}`;
+          return `stckClpr >= ${Math.abs(avlsScal)}`;
         } else {
-          return `CONVERT(stckClpr, FLOAT) <= ${Math.abs(avlsScal)}`;
+          return `stckClpr <= ${Math.abs(avlsScal)}`;
         }
       })(),
     ].filter((e) => e !== null);
-    const sql = ` 
-    select excd, symb
-      from OVERSEA_CONTINUOUS_INFO oci
-     where ${[' 1=1 ', ...conditions].join(' and ')};
-      `;
 
-    const recvData = sql; //await exeQuery(sql);
+    const sql = `
+      SELECT excd,symb,continuous,stckClpr,prdyAvlsScal,prdyCtrt,totalCtrt,htsKorIsnm,xymd
+      FROM OVERSEA_CONTINUOUS_INFO A
+      WHERE ${[' 1=1 ', ...conditions].join(' AND ')};
+    `;
+
+    const recvData: any[] = (await exeQuery(sql)) as any[];
+
     return recvData;
   },
-  //키값이 겹칠경우 UPDATE, 아니면 INSERT
+
   async mergeList(itemList: OVERSEA_CONTINUOUS_INFO[]): Promise<boolean> {
     for (const item of itemList) {
-      console.log(item);
       const sql = `
-    INSERT INTO OVERSEA_CONTINUOUS_INFO
-      (excd, symb, continuous, stckClpr, basedate)
-      VALUES
-      ('${item.excd}', '${item.symb}', ${
-        item.continuous ?? 'null'
-      }, ${item.stckClpr ?? 'null'}, '${item.basedate ?? 'null'}')
-    ON DUPLICATE KEY UPDATE
-      continuous = VALUES(continuous),
-      stckClpr = VALUES(stckClpr),
-      basedate = VALUES(basedate);
-  `;
+        INSERT INTO OVERSEA_CONTINUOUS_INFO A
+          (excd, symb, continuous, stckClpr, prdyAvlsScal, prdyCtrt, totalCtrt, htsKorIsnm, xymd)
+          VALUES
+          ('${item.excd}', '${item.symb}', ${item.continuous ?? 'null'}, ${
+        item.stckClpr ?? 'null'
+      }, ${item.prdyAvlsScal ?? 'null'}, ${item.prdyCtrt ?? 'null'}, ${
+        item.totalCtrt ?? 'null'
+      }, (select MAX(knam) from OVERSEA_ITEM_MAST B where A.excd = B.excd and A.symb = B.symb), '${
+        item.xymd
+      }')
+        ON DUPLICATE KEY UPDATE
+          continuous = VALUES(continuous),
+          stckClpr = VALUES(stckClpr),
+          prdyAvlsScal = VALUES(prdyAvlsScal),
+          prdyCtrt = VALUES(prdyCtrt),
+          totalCtrt = VALUES(totalCtrt),
+          htsKorIsnm = VALUES(htsKorIsnm);
+      `;
 
       await exeQuery(sql).catch((e) => {
         console.log(`'${item.excd}', '${item.symb}' insert failed`);
@@ -71,32 +81,49 @@ export const services = {
 
     return true;
   },
-  // 가장 최근 갱신일을 저장
+
   async getLastDay() {
     const sql = `
-          SELECT MIN(basedate) as lastD
-            FROM OVERSEA_CONTINUOUS_INFO;
-        `;
+      SELECT MAX(xymd) AS lastD
+      FROM OVERSEA_CONTINUOUS_INFO;
+    `;
 
     const lastday = await exeQuery(sql).catch((e) => {
-      console.log(`'getLastDay failed`);
+      console.log(`'getLastDay' failed`);
     });
+
     return lastday[0] ? lastday[0].lastD : null;
   },
-  // 특정 아이템 검색
-  async getData(excd, symb) {
-    const sql = ` 
-          select excd, symb, continuous, stckClpr, basedate
-            from OVERSEA_CONTINUOUS_INFO oci
-           where excd = '${excd}'
-             and symb = '${symb}';
-           `;
+
+  async getData(excd: string, symb: string) {
+    const sql = `
+      SELECT excd, symb, continuous, stckClpr, prdyAvlsScal, prdyCtrt, totalCtrt, htsKorIsnm, xymd
+      FROM OVERSEA_CONTINUOUS_INFO
+      WHERE excd = '${excd}'
+      AND symb = '${symb}'
+      ORDER BY xymd desc;
+    `;
 
     const recvData = await exeQuery(sql).catch((e) => {
-      console.log(`getData failed`);
+      console.log(`'getData' failed`);
       return null;
     });
-    console.log(recvData);
-    return recvData[0] ? recvData[0] : null;
+
+    return recvData;
+  },
+  async deleteData(excd: string, symb: string) {
+    const sql = `
+      DELETE
+        FROM OVERSEA_CONTINUOUS_INFO
+       WHERE excd = '${excd}'
+         AND symb = '${symb}';
+    `;
+
+    const recvData = await exeQuery(sql).catch((e) => {
+      console.log(`'deleteData' failed`);
+      return null;
+    });
+
+    return true;
   },
 };

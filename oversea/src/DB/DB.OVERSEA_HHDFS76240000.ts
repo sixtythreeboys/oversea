@@ -27,28 +27,51 @@ export class OVERSEA_HHDFS76240000 {
 }
 
 export const services = {
-  async getDataByDateList(excd, symb, DateList) {
+  async getDataByDateList(DateList) {
     DateList.sort();
+    if (DateList.length === 0) return null;
     try {
-      const dataList = Object.fromEntries(DateList.map((date) => [date, null]));
       const sql = `
           select excd,symb,xymd,clos,sign,diff,rate,\`open\` as open, high,low,tvol,tamt,pbid,vbid,pask,vask
             from OVERSEA_HHDFS76240000
            where xymd BETWEEN '${DateList[0]}' and '${
         DateList[DateList.length - 1]
       }'
-             and excd = '${excd}'
-             and symb = '${symb}';
+           order by xymd asc;
         `;
       const dbres = (await exeQuery(sql).catch((e) => {
         console.log(`'getDataByDateList failed`);
       })) as any[];
-      for (const row of dbres) {
-        dataList[row.xymd] = row;
-      }
 
+      return dbres;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  },
+  async getDataByDateList_V2(DateList) {
+    DateList.sort();
+    if (DateList.length === 0) return null;
+    try {
+      const dataList = Object.fromEntries(DateList.map((date) => [date, null]));
+
+      const dbres = this.getDataByDateList(DateList);
+
+      for (const row of dbres) {
+        let table = dataList;
+        if (table[row.xymd] === null) {
+          table[row.xymd] = {};
+        }
+        table = table[row.xymd];
+        if (table[row.excd] === undefined) {
+          table[row.excd] = {};
+        }
+        table = table[row.excd];
+        table[row.symb] = row;
+      }
       return dataList;
     } catch (e) {
+      console.log(e);
       return null;
     }
   },

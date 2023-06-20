@@ -15,22 +15,16 @@ export class BatchService {
   constructor(
     @Inject(OverseaService) private readonly oversea: OverseaService,
   ) {
-    //this.moduleInit();
-    temp().then((e) => console.log(`temp done`));
+    this.moduleInit();
   }
   async moduleInit() {
     await updateToken();
-    this.job = new CronJob('0 0 1 * * *', async () => {
-      // 매일 1시 실행
+    this.job = new CronJob('0 0 2 * * *', async () => {
+      const TODAY = getToday();
+      await fill_updateTradingDate(TODAY);
+      await fill_updateDetailInfo(TODAY);
+      await fill_updateUpDown(TODAY);
     });
     this.job.start();
   }
-}
-
-async function temp() {
-  await updateToken();
-  const TODAY = getToday();
-  //await fill_updateTradingDate(TODAY);
-  // await fill_updateDetailInfo(TODAY);
-  await fill_updateUpDown(TODAY);
 }

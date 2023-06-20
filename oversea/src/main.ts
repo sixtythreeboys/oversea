@@ -7,7 +7,7 @@ import { init as KISWS } from 'src/KIS/KISWS';
 import config from 'config';
 
 async function init() {
-  const initList = { KISWS, DB, COMMON }; //{ EUREKA, DB, KISWS, COMMON };
+  const initList = { EUREKA, DB, KISWS, COMMON };
   await Promise.all(
     Object.keys(initList).map(async (service) => {
       try {

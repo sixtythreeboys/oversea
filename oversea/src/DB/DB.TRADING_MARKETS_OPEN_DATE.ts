@@ -66,9 +66,8 @@ export const services = {
      where tr_mket_name = '나스닥'
        and DATE_FORMAT(acpl_sttl_dt, '%Y%m%d') <= '${startdate}'
      order by acpl_sttl_dt desc
-     limit ${period};
+     ${period === 0 ? '' : `limit ${period}`};
           `;
-
       let days = await exeQuery(sql).then((e: any) =>
         e.map((e) => e.acpl_sttl_dt),
       );

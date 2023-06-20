@@ -1,20 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { APIS } from '../KIS/KISAPIS';
 import { services as OVERSEA_CONTINUOUS_INFO } from 'src/DB/DB.OVERSEA_CONTINUOUS_INFO';
+import { services as OVERSEA_HHDFS76240000 } from 'src/DB/DB.OVERSEA_HHDFS76240000';
+import { services as TRADING_MARKETS_OPEN_DATE } from 'src/DB/DB.TRADING_MARKETS_OPEN_DATE';
+import { services as OVERSEA_ITEM_MAST } from 'src/DB/DB.OVERSEA_ITEM_MAST';
+import { getToday } from 'src/common/util/dateUtils';
 
 @Injectable()
 export class OverseaService {
   async list({ period, avlsScal }) {
-    if (period === 0) {
-      throw new Error('연속기간의 크기는 0이 될 수 없습니다.');
-    }
-    let data = null;
-    data = await OVERSEA_CONTINUOUS_INFO.getDataByOption({
-      period: parseInt(period),
-      avlsScal: parseFloat(avlsScal),
+    let itemList = null;
+    [period, avlsScal] = [parseInt(period), parseFloat(avlsScal)];
+    itemList = await OVERSEA_CONTINUOUS_INFO.getDataByOption({
+      period,
+      avlsScal,
+    });
+    itemList = itemList.map((item) => {
+      return {
+        excd: item.excd,
+        mkscShrnIscd: item.symb,
+        htsKorIsnm: item.htsKorIsnm,
+        stckClpr: item.stckClpr,
+        prdyAvlsScal: '-',
+        prdyCtrt: item.prdyCtrt,
+        totalCtrt: item.totalCtrt,
+      };
     });
 
-    return true;
+    return itemList;
   }
 
   async getDetail({ EXCD, 종목코드, 기간분류코드, period }) {

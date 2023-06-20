@@ -4,67 +4,58 @@ import { services as TRADING_MARKETS_OPEN_DATE } from 'src/DB/DB.TRADING_MARKETS
 import { getDateList } from 'src/common/util/dateUtils';
 import { services as OVERSEA_HHDFS76240000 } from 'src/DB/DB.OVERSEA_HHDFS76240000';
 import { dbModel } from 'src/DB/DB.model';
+import { exeQuery } from 'src/DB/DB.service';
 
-async function updateUpDown(excd, symb, detailDatas, basedate) {
-  const continuousData: any = await OVERSEA_CONTINUOUS_INFO.getData(excd, symb);
-  
-  if (continuousData === null) return null;
+export async function updateByRow({ excd, symb, xymd, clos, rate }) {
+  rate = parseFloat(rate);
+  const ContiData = await OVERSEA_CONTINUOUS_INFO.getData(excd, symb);
+  const lastData = ContiData[0];
+  if (lastData.xymd === xymd) return false;
 
-  for (const detail of detailDatas) {
-    detail.rate = parseFloat(detail.rate);
-    if (continuousData.continuous > 0) {
-      if (detail.rate >= 0) {
-        continuousData.continuous += 1;
-      } else {
-        continuousData.continuous = 1;
-      }
-    } else if (continuousData.continuous < 0) {
-      if (detail.rate <= 0) {
-        continuousData.continuous -= 1;
-      } else {
-        continuousData.continuous = 1;
-      }
-    } else {
-      continuousData.continuous =
-        detail.rate === 0 ? 0 : detail.rate < 0 ? -1 : 1;
-    }
-    continuousData.stckClpr = detail.clos;
-    console.log(continuousData);
+  if (lastData.prdyCtrt * rate < 0) {
+    lastData.continuous = 0;
+    lastData.totalCtrt = 0;
+    await OVERSEA_CONTINUOUS_INFO.deleteData(excd, symb);
+    await OVERSEA_CONTINUOUS_INFO.mergeList([
+      lastData,
+      {
+        excd: excd,
+        symb: symb,
+        continuous: lastData.continuous + 1,
+        stckClpr: clos,
+        prdyAvlsScal: null,
+        prdyCtrt: rate,
+        totalCtrt: lastData.totalCtrt + rate,
+        htsKorIsnm: null,
+        xymd: xymd,
+      },
+    ]);
+    console.log(`updateByRow : ${excd} ${symb} ${xymd} swapped`);
+  } else {
+    await OVERSEA_CONTINUOUS_INFO.mergeList([
+      {
+        excd: excd,
+        symb: symb,
+        continuous: lastData.continuous + 1,
+        stckClpr: clos,
+        prdyAvlsScal: null,
+        prdyCtrt: rate,
+        totalCtrt: lastData.totalCtrt + rate,
+        htsKorIsnm: null,
+        xymd: xymd,
+      },
+    ]);
+    console.log(`updateByRow : ${excd} ${symb} ${xymd} added`);
   }
-  continuousData.basedate = basedate;
-  return continuousData;;
+  return true;
 }
-
 export async function fillEmpty_NAS(today) {
   console.log(`updateUpDown started : ${today}`);
-  let itemList: any[] = await OVERSEA_ITEM_MAST.getItemList();
-  const [ContinuousLastDay, DetailLastDay] = [
-    '20230606',//await OVERSEA_CONTINUOUS_INFO.getLastDay(),
-    await OVERSEA_HHDFS76240000.getLastDay(),
-  ];
-  const dateList = getDateList(ContinuousLastDay, DetailLastDay);
-  itemList = await Promise.all(
-    itemList.map(async ({ excd, symb }) => {
-      let detailDatas = await OVERSEA_HHDFS76240000.getDataByDateList(
-        excd,
-        symb,
-        dateList,
-      );
-      detailDatas = Object.values(detailDatas).filter((data) => data);
-      
-      return await updateUpDown(excd, symb, detailDatas, today);
-    }),
+  const dateList = await TRADING_MARKETS_OPEN_DATE.getNasOpenList(
+    await OVERSEA_CONTINUOUS_INFO.getLastDay(),
   );
-  itemList = itemList.filter(e=>e);
+  let itemList = await OVERSEA_HHDFS76240000.getDataByDateList(dateList);
 
-  // if (await OVERSEA_CONTINUOUS_INFO.mergeList(itemList)) {
-  //   console.log(
-  //     `${itemList.length} items inserted into OVERSEA_CONTINUOUS_INFO.`,
-  //   );
-  //   dbModel.connection.commit();
-  // } else {
-  //   console.log('OVERSEA_CONTINUOUS_INFO insert failed');
-  // }
-
+  await Promise.all(itemList.map((row) => updateByRow(row)));
   return true;
 }

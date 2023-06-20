@@ -9,7 +9,17 @@ export class OverseaController {
   constructor(private readonly oversea: OverseaService) {}
 
   @Get('test')
-  async test(@Res() res: Response, @Query() params: any) {}
+  async test(@Res() res: Response, @Query() params: any) {
+    try {
+      const resData = await this.oversea.list({
+        period: '0',
+        avlsScal: '0',
+      });
+      res.status(200).send(resData);
+    } catch (e) {
+      res.status(500).send(e);
+    }
+  }
 
   @Get('list')
   async list(
