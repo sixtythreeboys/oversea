@@ -21,7 +21,7 @@ export async function updateByRow({ excd, symb, xymd, clos, rate }) {
       {
         excd: excd,
         symb: symb,
-        continuous: lastData.continuous + 1,
+        continuous: lastData.continuous + (rate > 0 ? 1 : -1),
         stckClpr: clos,
         prdyAvlsScal: null,
         prdyCtrt: rate,
@@ -36,7 +36,7 @@ export async function updateByRow({ excd, symb, xymd, clos, rate }) {
       {
         excd: excd,
         symb: symb,
-        continuous: lastData.continuous + 1,
+        continuous: lastData.continuous + (lastData.continuous > 0 ? 1 : -1),
         stckClpr: clos,
         prdyAvlsScal: null,
         prdyCtrt: rate,
