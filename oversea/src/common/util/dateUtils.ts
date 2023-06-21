@@ -17,10 +17,9 @@ export function getDateDiff(date1: string, date2: string): number {
   const month2 = parseInt(date2.substring(4, 6)) - 1; // Month is zero-based
   const day2 = parseInt(date2.substring(6, 8));
 
-  const diffTime = Math.abs(
+  const diffTime =
     new Date(year2, month2, day2).getTime() -
-      new Date(year1, month1, day1).getTime(),
-  );
+    new Date(year1, month1, day1).getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diffDays;
 }

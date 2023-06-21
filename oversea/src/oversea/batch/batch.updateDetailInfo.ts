@@ -3,6 +3,7 @@ import { services as OVERSEA_HHDFS76240000 } from 'src/DB/DB.OVERSEA_HHDFS762400
 import { services as TRADING_MARKETS_OPEN_DATE } from 'src/DB/DB.TRADING_MARKETS_OPEN_DATE';
 import { APIS } from 'src/KIS/KISAPIS';
 import { dbModel } from 'src/DB/DB.model';
+import { getDateDiff } from 'src/common/util/dateUtils';
 
 async function updateDetailInfo(basedate) {
   console.log(`updateDetailInfo started : ${basedate}`);
@@ -46,7 +47,8 @@ async function updateDetailInfo(basedate) {
 export async function fillEmpty(today) {
   const dateList = await TRADING_MARKETS_OPEN_DATE.getNasOpenList(
     await OVERSEA_HHDFS76240000.getLastDay(),
-  );
+  ).then((e) => e.filter((e) => getDateDiff(today, e) < 0));
+
   for (const date of dateList) {
     await updateDetailInfo(date);
   }
