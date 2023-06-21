@@ -17,15 +17,14 @@ export async function updateByRow({ excd, symb, xymd, clos, rate }) {
     lastData.totalCtrt = 0;
     await OVERSEA_CONTINUOUS_INFO.deleteData(excd, symb);
     await OVERSEA_CONTINUOUS_INFO.mergeList([
-      lastData,
       {
         excd: excd,
         symb: symb,
-        continuous: lastData.continuous + (rate > 0 ? 1 : -1),
+        continuous: rate > 0 ? 1 : -1,
         stckClpr: clos,
         prdyAvlsScal: null,
         prdyCtrt: rate,
-        totalCtrt: lastData.totalCtrt + rate,
+        totalCtrt: rate,
         htsKorIsnm: null,
         xymd: xymd,
       },
