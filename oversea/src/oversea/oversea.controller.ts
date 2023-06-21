@@ -29,8 +29,8 @@ export class OverseaController {
   ) {
     try {
       const resData = await this.oversea.list({
-        period,
-        avlsScal,
+        period: period ?? 0,
+        avlsScal: avlsScal ?? 0,
       });
       res.status(200).send(resData);
     } catch (e) {
@@ -55,9 +55,10 @@ export class OverseaController {
       if (!['D', 'W', 'M'].includes(기간분류코드)) {
         return false;
       }
-      period = period
-        ? parseInt(period as string)
-        : CONFIG.KIS.urls.해외주식_기간별시세.defaultLength;
+      period =
+        period || period === 0
+          ? parseInt(period as string)
+          : CONFIG.KIS.urls.해외주식_기간별시세.defaultLength;
       if (Number.isNaN(period)) {
         return false;
       }

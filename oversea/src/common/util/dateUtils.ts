@@ -25,19 +25,24 @@ export function getDateDiff(date1: string, date2: string): number {
   return diffDays;
 }
 
+export function addDaysToDate(basedate: string, add: number): string {
+  const dateObj = new Date(
+    `${basedate.substr(0, 4)}-${basedate.substr(4, 2)}-${basedate.substr(
+      6,
+      2,
+    )}`,
+  );
+  dateObj.setDate(dateObj.getDate() + add);
+
+  const year = dateObj.getFullYear();
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const day = String(dateObj.getDate()).padStart(2, '0');
+
+  return `${year}${month}${day}`;
+}
+
 export function addOneDay(date: string): string {
-  const year = Number(date.substring(0, 4));
-  const month = Number(date.substring(4, 6)) - 1; // Subtract 1 from the month since it's zero-based in JavaScript Date object
-  const day = Number(date.substring(6, 8));
-
-  const currentDate = new Date(year, month, day);
-  currentDate.setDate(currentDate.getDate() + 1);
-
-  const newYear = currentDate.getFullYear();
-  const newMonth = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Add 1 to the month and pad with leading zero if needed
-  const newDay = currentDate.getDate().toString().padStart(2, '0'); // Pad the day with leading zero if needed
-
-  return `${newYear}${newMonth}${newDay}`;
+  return addDaysToDate(date, 1);
 }
 
 export function getDateList(start, end) {
