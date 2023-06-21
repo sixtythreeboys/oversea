@@ -26,7 +26,7 @@ export class OverseaService {
         totalCtrt: item.totalCtrt,
       };
     });
-    itemList.sort((a, b) => a.stckClpr > b.stckClpr);
+    itemList.sort((a, b) => b.stckClpr - a.stckClpr);
     return itemList;
   }
 
