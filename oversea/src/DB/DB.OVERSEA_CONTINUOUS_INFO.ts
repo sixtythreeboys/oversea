@@ -55,16 +55,16 @@ export const services = {
   async mergeList(itemList: OVERSEA_CONTINUOUS_INFO[]): Promise<boolean> {
     for (const item of itemList) {
       const sql = `
-        INSERT INTO OVERSEA_CONTINUOUS_INFO A
+        INSERT INTO OVERSEA_CONTINUOUS_INFO
           (excd, symb, continuous, stckClpr, prdyAvlsScal, prdyCtrt, totalCtrt, htsKorIsnm, xymd)
           VALUES
           ('${item.excd}', '${item.symb}', ${item.continuous ?? 'null'}, ${
         item.stckClpr ?? 'null'
       }, ${item.prdyAvlsScal ?? 'null'}, ${item.prdyCtrt ?? 'null'}, ${
         item.totalCtrt ?? 'null'
-      }, (select MAX(knam) from OVERSEA_ITEM_MAST B where A.excd = B.excd and A.symb = B.symb), '${
-        item.xymd
-      }')
+      }, (select MAX(knam) from OVERSEA_ITEM_MAST where excd = '${
+        item.excd
+      }' and symb = '${item.symb}'), '${item.xymd}')
         ON DUPLICATE KEY UPDATE
           continuous = VALUES(continuous),
           stckClpr = VALUES(stckClpr),
