@@ -31,6 +31,14 @@ export default {
         path: '/uapi/overseas-stock/v1/quotations/countries-holiday',
         tr_id: 'CTOS5011R',
       },
+      '해외주식 종목/지수/환율기간별시세(일/주/월/년)': {
+        path: '/uapi/overseas-price/v1/quotations/inquire-daily-chartprice',
+        tr_id: 'FHKST03030100',
+      },
+      해외주식_현재가상세: {
+        path: '/uapi/overseas-price/v1/quotations/price-detail',
+        tr_id: 'HHDFS76200200',
+      },
       접근토큰발급: {
         path: '/oauth2/tokenP',
       },

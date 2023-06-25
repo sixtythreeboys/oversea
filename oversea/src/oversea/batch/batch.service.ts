@@ -12,6 +12,7 @@ import { services as OVERSEA_HHDFS76240000 } from 'src/DB/DB.OVERSEA_HHDFS762400
 import { fillEmpty as fill_updateTradingDate } from './batch.updateTradingDate';
 import { fillEmpty as fill_updateDetailInfo } from './batch.updateDetailInfo';
 import { fillEmpty_NAS as fill_updateUpDown } from './batch.updateUpDown';
+import { APIS } from 'src/KIS/KISAPIS';
 
 @Injectable()
 export class BatchService {
@@ -24,6 +25,12 @@ export class BatchService {
   }
   async moduleInit() {
     await updateToken();
+
+    const TODAY = getToday();
+    // await fill_updateTradingDate(TODAY);
+    // await fill_updateDetailInfo(TODAY);
+    await fill_updateUpDown(TODAY);
+
     this.job = new CronJob('0 0 2 * * *', async () => {
       const TODAY = getToday();
       await fill_updateTradingDate(TODAY);
@@ -32,4 +39,7 @@ export class BatchService {
     });
     this.job.start();
   }
+}
+async function batchPack(TODAY) {
+  await updateToken();
 }

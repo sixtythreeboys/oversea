@@ -11,6 +11,7 @@ export class OVERSEA_CONTINUOUS_INFO {
   totalCtrt?: number | null;
   htsKorIsnm?: string | null;
   xymd: string;
+  cdate?: string | null; // New column: cdate
 
   constructor(excd: string, symb: string, xymd: string) {
     this.excd = excd;
@@ -42,7 +43,7 @@ export const services = {
     ].filter((e) => e !== null);
 
     const sql = `
-      SELECT excd,symb,continuous,stckClpr,prdyAvlsScal,prdyCtrt,totalCtrt,htsKorIsnm,xymd
+      SELECT excd, symb, continuous, stckClpr, prdyAvlsScal, prdyCtrt, totalCtrt, htsKorIsnm, xymd
       FROM OVERSEA_CONTINUOUS_INFO A
       WHERE ${[' 1=1 ', ...conditions].join(' AND ')};
     `;
@@ -56,22 +57,23 @@ export const services = {
     for (const item of itemList) {
       const sql = `
         INSERT INTO OVERSEA_CONTINUOUS_INFO
-          (excd, symb, continuous, stckClpr, prdyAvlsScal, prdyCtrt, totalCtrt, htsKorIsnm, xymd)
+          (excd, symb, continuous, stckClpr, prdyAvlsScal, prdyCtrt, totalCtrt, htsKorIsnm, xymd, cdate)
           VALUES
           ('${item.excd}', '${item.symb}', ${item.continuous ?? 'null'}, ${
         item.stckClpr ?? 'null'
       }, ${item.prdyAvlsScal ?? 'null'}, ${item.prdyCtrt ?? 'null'}, ${
         item.totalCtrt ?? 'null'
-      }, (select MAX(knam) from OVERSEA_ITEM_MAST where excd = '${
+      }, (SELECT MAX(knam) FROM OVERSEA_ITEM_MAST WHERE excd = '${
         item.excd
-      }' and symb = '${item.symb}'), '${item.xymd}')
+      }' AND symb = '${item.symb}'), '${item.xymd}', CURDATE())
         ON DUPLICATE KEY UPDATE
           continuous = VALUES(continuous),
           stckClpr = VALUES(stckClpr),
           prdyAvlsScal = VALUES(prdyAvlsScal),
           prdyCtrt = VALUES(prdyCtrt),
           totalCtrt = VALUES(totalCtrt),
-          htsKorIsnm = VALUES(htsKorIsnm);
+          htsKorIsnm = VALUES(htsKorIsnm),
+          cdate = VALUES(cdate);
       `;
 
       await exeQuery(sql).catch((e) => {

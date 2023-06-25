@@ -5,6 +5,8 @@ import {
   HHDFS76240000,
   makeHeader,
   CTOS5011R,
+  HHDFS76200200,
+  FHKST03030100,
 } from '../oversea/oversea.type';
 import { enqueue } from 'src/KIS/delayingQueue';
 import { getToday } from 'src/common/util/dateUtils';
@@ -112,6 +114,7 @@ export const APICallers = {
     });
     const { ctx_area_fk, ctx_area_nk, output, rt_cd, msg_cd, msg1 } =
       recvData.data;
+    console.log();
 
     if (rt_cd !== '0') {
       throw { status: 500, data: { rt_cd, msg1 } };
@@ -119,6 +122,76 @@ export const APICallers = {
     return {
       data: output,
       cont: ['M'].includes(recvData.headers.tr_cont) ? 'Y' : 'N',
+    };
+  },
+  async FHKST03030100(headers: any, params: FHKST03030100) {
+    const TODAY = getToday();
+    const recvData: { status; headers; data } = await axios({
+      method: 'get',
+      url: `${config.KIS.real}${config.KIS.urls['해외주식 종목/지수/환율기간별시세(일/주/월/년)'].path}`,
+      headers: makeHeader(
+        Object.assign(
+          {
+            tr_id: 'FHKST03030100',
+            custtype: 'P',
+          },
+          headers,
+        ),
+      ),
+      params: Object.assign(
+        {
+          FID_COND_MRKT_DIV_CODE: 'N',
+          FID_INPUT_DATE_1: TODAY,
+          FID_INPUT_DATE_2: TODAY,
+          FID_PERIOD_DIV_CODE: 'D',
+        } as FHKST03030100,
+        params,
+      ),
+    });
+    const { output, rt_cd, msg_cd, msg1 } = recvData.data;
+
+    // if (rt_cd !== '0') {
+    //   throw { status: 500, data: { rt_cd, msg1 } };
+    // } else if (output.tomv === '') {
+    //   throw { status: 500, data: { rt_cd, msg1: '유효하지않은 종목코드' } };
+    // }
+    // return {
+    //   data: output,
+    //   cont: ['M', 'F'].includes(recvData.headers.tr_cont) ? 'Y' : 'N',
+    // };
+  },
+
+  async HHDFS76200200(headers: any, params: HHDFS76200200) {
+    const recvData: { status; headers; data } = await axios({
+      method: 'get',
+      url: `${config.KIS.real}${config.KIS.urls.해외주식_현재가상세.path}`,
+      headers: makeHeader(
+        Object.assign(
+          {
+            tr_id: 'HHDFS76200200',
+            custtype: 'P',
+          },
+          headers,
+        ),
+      ),
+      params: Object.assign(
+        {
+          AUTH: '',
+          EXCD: 'NAS',
+        } as HHDFS76200200,
+        params,
+      ),
+    });
+    const { output, rt_cd, msg_cd, msg1 } = recvData.data;
+
+    if (rt_cd !== '0') {
+      throw { status: 500, data: { rt_cd, msg1 } };
+    } else if (output.tomv === '') {
+      throw { status: 500, data: { rt_cd, msg1: '유효하지않은 종목코드' } };
+    }
+    return {
+      data: output,
+      cont: ['M', 'F'].includes(recvData.headers.tr_cont) ? 'Y' : 'N',
     };
   },
 };
@@ -154,6 +227,20 @@ export const APIS = {
   },
   async CTOS5011R(params: any) {
     const recvData = await APICallers.CTOS5011R({}, params);
+    return recvData;
+  },
+  async FHKST03030100(params: {
+    FID_COND_MRKT_DIV_CODE: string;
+    FID_INPUT_ISCD: string;
+    FID_INPUT_DATE_1: string;
+    FID_INPUT_DATE_2: string;
+    FID_PERIOD_DIV_CODE: 'D' | 'W' | 'Y';
+  }) {
+    const recvData = await APICallers.FHKST03030100({}, params);
+    return recvData;
+  },
+  async HHDFS76200200(params: any) {
+    const recvData = await APICallers.HHDFS76200200({}, params);
     return recvData;
   },
 };

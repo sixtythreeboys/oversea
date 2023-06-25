@@ -57,6 +57,20 @@ export type CTOS5011R = {
   CTX_AREA_FK: '';
 };
 
+export type FHKST03030100 = {
+  FID_COND_MRKT_DIV_CODE: string;
+  FID_INPUT_ISCD: string;
+  FID_INPUT_DATE_1: string;
+  FID_INPUT_DATE_2: string;
+  FID_PERIOD_DIV_CODE: 'D' | 'W' | 'Y';
+};
+
+export type HHDFS76200200 = {
+  AUTH: '';
+  EXCD: Markets;
+  SYMB: string;
+};
+
 export type Header = {
   'content-type'?: string;
   authorization?: string;
