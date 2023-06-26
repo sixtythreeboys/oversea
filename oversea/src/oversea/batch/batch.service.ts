@@ -26,10 +26,10 @@ export class BatchService {
   async moduleInit() {
     await updateToken();
 
-    const TODAY = getToday();
+    //const TODAY = getToday();
     // await fill_updateTradingDate(TODAY);
     // await fill_updateDetailInfo(TODAY);
-    await fill_updateUpDown(TODAY);
+    //await fill_updateUpDown(TODAY);
 
     this.job = new CronJob('0 0 2 * * *', async () => {
       const TODAY = getToday();

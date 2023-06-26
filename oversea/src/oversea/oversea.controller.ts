@@ -34,7 +34,7 @@ export class OverseaController {
     }
   }
 
-  @Get('price-by-period')
+  @Get('pirce-by-period')
   async detail(
     @Res() res: Response,
     @Query('EXCD') EXCD: string,
@@ -69,12 +69,12 @@ export class OverseaController {
           period,
         })
         .then((e) => {
-          const { status, data } = e as any;
-          res.status(status).send(data);
+          const data = e as any;
+          res.status(200).send(data);
         })
         .catch((e) => {
-          const { status, data } = e;
-          res.status(status).send(data);
+          const data = e;
+          res.status(500).send(data);
         });
     } else {
       res.status(500).send({ err: '잘못된 인자' });
