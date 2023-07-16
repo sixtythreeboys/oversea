@@ -7,7 +7,7 @@ import { init as DB } from 'src/DB/DB.service';
 import config from 'config';
 
 async function init() {
-  const initList = { EUREKA, DB, /*KISWS*/, COMMON };
+  const initList = { EUREKA, DB, /*KISWS*/ COMMON };
   await Promise.all(
     Object.keys(initList).map(async (service) => {
       try {
