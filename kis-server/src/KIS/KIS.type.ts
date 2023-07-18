@@ -60,6 +60,16 @@ export function makeWSdata(body: any) {
   };
 }
 
+export type HHDFS76240000 = {
+  AUTH: '';
+  EXCD: Markets;
+  SYMB: string;
+  GUBN: '0' | '1' | '2';
+  BYMD: string;
+  MODP: '0' | '1';
+  KEYB: string;
+};
+
 export const markets: Markets[] = [
   'NYS',
   'NAS',

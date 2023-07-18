@@ -1,5 +1,5 @@
 import _CONFIG from '../../config';
-import { Queue } from 'src/common/common.type';
+import { Queue } from 'src/common/class.queue';
 
 export const CONFIG = _CONFIG.COMMON.delayingQueue;
 
@@ -36,6 +36,14 @@ async function exec() {
 export async function enqueue(func: Function) {
   const ret = new Promise(function (resolve, reject) {
     queue.enqueue({ func, resolve, reject });
+  });
+  exec();
+  return ret;
+}
+
+export async function enqueueFront(func: Function) {
+  const ret = new Promise(function (resolve, reject) {
+    queue.enqueueFront({ func, resolve, reject });
   });
   exec();
   return ret;

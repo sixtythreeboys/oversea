@@ -19,6 +19,11 @@ export default {
         path: '/uapi/overseas-price/v1/quotations/price-detail',
         tr_id: 'HHDFS76200200',
       },
+      해외주식_기간별시세: {
+        path: '/uapi/overseas-price/v1/quotations/dailyprice',
+        tr_id: 'HHDFS76240000',
+        defaultLength: 100,
+      },
       접근토큰발급: {
         path: '/oauth2/tokenP',
       },
