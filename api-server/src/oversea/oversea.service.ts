@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { APIS } from 'src/KISserver/KISserver.apis';
 
 @Injectable()
 export class OverseaService {
   async list({ period, avlsScal }) {}
 
   async getDetail({ EXCD, 종목코드, 기간분류코드, period }) {
-    const datas = await APIS.HHDFS76240000(
+    const datas = await APIS.getDetail(
       {
         EXCD: EXCD,
         SYMB: 종목코드,

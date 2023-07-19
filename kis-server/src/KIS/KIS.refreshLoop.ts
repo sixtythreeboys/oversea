@@ -15,7 +15,7 @@ export const LoopCallback = [
         update,
         options,
       );
-      console.log(result);
+      //console.log(result);
     } catch (error) {
       console.log('Error occurred:', error);
     }

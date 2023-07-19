@@ -1,9 +1,10 @@
 export default {
   APP: {
     PORT: '8080',
-    MAC_ADDRESS: '000000000000',
-    PHONE_NUM: '01012345678',
-    IP_ADDR: '172.31.36.186',
+  },
+  kis_server: {
+    IP: 'localhost',
+    PORT: '8081',
   },
   EUREKA: {
     instance: {

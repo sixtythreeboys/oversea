@@ -51,10 +51,6 @@ export class OverseaController {
       if (!['D', 'W', 'M'].includes(기간분류코드)) {
         return false;
       }
-      period =
-        period || period === 0
-          ? parseInt(period as string)
-          : CONFIG.KIS.urls.해외주식_기간별시세.defaultLength;
       if (Number.isNaN(period)) {
         return false;
       }
@@ -73,8 +69,7 @@ export class OverseaController {
           res.status(200).send(data);
         })
         .catch((e) => {
-          const data = e;
-          res.status(500).send(data);
+          res.status(500).send(e);
         });
     } else {
       res.status(500).send({ err: '잘못된 인자' });

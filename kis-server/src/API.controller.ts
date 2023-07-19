@@ -1,5 +1,8 @@
 import { Body, Controller, Get, Query, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
+import { APIS } from './KIS/KIS.apis';
+import { HHDFS76240000 } from './KIS/KIS.type';
+import CONFIG from 'config';
 
 @Controller('api')
 export class APIController {
@@ -14,12 +17,21 @@ export class APIController {
     }
   }
 
-  @Get('HHDFS76240000')
-  async detail(
+  @Post('HHDFS76240000')
+  async HHDFS76240000(
     @Res() res: Response,
-    @Query('EXCD') EXCD: string,
-    @Query('종목코드') 종목코드: string,
-    @Query('기간분류코드') 기간분류코드: string,
-    @Query('period') period: string | number,
-  ) {}
+    @Body('params') params: object,
+    @Body('period') period: number,
+  ) {
+    try {
+      period =
+        period && period !== 0
+          ? period
+          : CONFIG.KIS.urls.해외주식_기간별시세.defaultLength;
+      const data = await APIS.HHDFS76240000(params as HHDFS76240000, period);
+      res.status(200).send(data);
+    } catch (e) {
+      res.status(500).send(e);
+    }
+  }
 }
