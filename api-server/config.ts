@@ -5,6 +5,8 @@ export default {
   kis_server: {
     IP: 'localhost',
     PORT: '8081',
+    WS: 'ws://localhost:8081/socket',
+    reconnectIntv: 20000,
   },
   EUREKA: {
     instance: {

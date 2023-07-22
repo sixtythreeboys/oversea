@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Query, Post, Res } from '@nestjs/common';
 import { OverseaService } from './oversea.service';
 import { Response } from 'express';
-import CONFIG from '../../config';
 
 @Controller('oversea')
 export class OverseaController {
@@ -10,7 +9,6 @@ export class OverseaController {
   @Get('test')
   async test(@Res() res: Response, @Query() params: any) {
     try {
-      //APIS.HHDFS76200200({ SYMB: 'AAPL' });
       res.status(200).send(true);
     } catch (e) {
       res.status(500).send(e);

@@ -7,4 +7,5 @@ export default {
   },
   approval_key: null,
   hashkey: null,
+  apiServerWsClient: null,
 };

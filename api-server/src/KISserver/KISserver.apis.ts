@@ -1,7 +1,9 @@
+import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import CONFIG from 'config';
 
-export const APIS = {
+@Injectable()
+export class ApiService {
   async getDetail(params: any, period: number) {
     const apiUrl = `http://${CONFIG.kis_server.IP}:${CONFIG.kis_server.PORT}/api/HHDFS76240000`;
     const requestData = {
@@ -13,5 +15,5 @@ export const APIS = {
       requestData,
     );
     return recvData.data;
-  },
-};
+  }
+}

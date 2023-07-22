@@ -2,11 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { init as COMMON } from './common/init';
 import { init as MongoDB } from 'src/MongoDB/MongoDB.service';
-import { init as KISLoop } from './KIS/KIS.refreshLoop';
 import config from 'config';
 
 async function init() {
-  const initList = { MongoDB, KISLoop, COMMON };
+  const initList = { MongoDB, COMMON };
   await Promise.all(
     Object.keys(initList).map(async (service) => {
       try {

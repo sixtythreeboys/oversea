@@ -1,10 +1,11 @@
+import { Injectable } from '@nestjs/common';
 import config from 'config';
 import axios from 'axios';
-import { enqueue, enqueueFront } from 'src/KIS/KIS.delayingQueue';
+import { enqueue, enqueueFront } from 'src/KIS/util/KIS.delayingQueue';
 import { HHDFS76200200, HHDFS76240000, makeHeader } from 'src/KIS/KIS.type';
 import { checkTokenMiddleware } from './KIS.middleware';
 
-export const APICallers = {
+const APICallers = {
   async oauth2Approval() {
     return axios.post(
       `${config.KIS.real}/oauth2/Approval`,
@@ -47,7 +48,11 @@ export const APICallers = {
     if (rt_cd !== '0') {
       throw { status: 500, data: { rt_cd, msg1 } };
     } else if (output.tomv === '') {
-      throw { status: 500, data: { rt_cd, msg1: '유효하지않은 종목코드' } };
+      throw {
+        status: 500,
+        params,
+        data: { rt_cd, msg1: '유효하지않은 종목코드' },
+      };
     }
     return {
       data: output,
@@ -92,30 +97,6 @@ export const APICallers = {
   },
 };
 
-export const APIS = {
-  async oauth2Approval() {
-    return APICallers.oauth2Approval();
-  },
-  async HHDFS76200200(params: any) {
-    const recvData = await APICallers.HHDFS76200200({}, params);
-    return recvData;
-  },
-  async HHDFS76240000(params: HHDFS76240000, period: number) {
-    let ret = [];
-    let recvData = await APICallers.HHDFS76240000({}, params);
-    ret = ret.concat(recvData.data);
-    while (recvData.cont === 'Y') {
-      recvData = await APICallers.HHDFS76240000({ tr_cont: 'N' }, params);
-      ret = ret.concat(recvData.data);
-      if (ret.length >= period) {
-        ret = ret.slice(0, period);
-        break;
-      }
-    }
-    return ret;
-  },
-};
-
 for (const key of Object.keys(APICallers).filter(
   (key) => typeof APICallers[key] === 'function',
 )) {
@@ -132,4 +113,30 @@ for (const key of Object.keys(APICallers).filter(
       });
     },
   });
+}
+
+@Injectable()
+export class APIService {
+  async oauth2Approval() {
+    return APICallers.oauth2Approval();
+  }
+
+  async HHDFS76200200(params: HHDFS76200200) {
+    return APICallers.HHDFS76200200({}, params);
+  }
+
+  async HHDFS76240000(params: HHDFS76240000, period: number) {
+    let ret = [];
+    let recvData = await APICallers.HHDFS76240000({}, params);
+    ret = ret.concat(recvData.data);
+    while (recvData.cont === 'Y') {
+      recvData = await APICallers.HHDFS76240000({ tr_cont: 'N' }, params);
+      ret = ret.concat(recvData.data);
+      if (ret.length >= period) {
+        ret = ret.slice(0, period);
+        break;
+      }
+    }
+    return ret;
+  }
 }
