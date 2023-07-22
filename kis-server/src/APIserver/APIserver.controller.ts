@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Query, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
-import { APIService } from './KIS/KIS.API.service';
-import { HHDFS76240000 } from './KIS/KIS.type';
+import { APIService } from 'src/KIS/KIS.API.service';
+import { HHDFS76240000 } from 'src/KIS/KIS.type';
 import CONFIG from 'config';
 
 @Controller('api')

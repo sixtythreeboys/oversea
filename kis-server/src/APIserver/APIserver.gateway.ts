@@ -9,8 +9,8 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, WebSocket } from 'ws';
-import KISModel from './KIS/KIS.model';
-import { LoopCallback } from './KIS/KIS.refreshLoop.service';
+import KISModel from 'src/KIS/KIS.model';
+import { LoopCallback } from 'src/KIS/KIS.refreshLoop.service';
 
 @WebSocketGateway({
   cors: {
