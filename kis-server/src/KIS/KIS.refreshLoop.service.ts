@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ITEM_MAST } from 'src/MongoDB/Model/MongoDB.ITEM_MAST';
 import { HHDFS76200200 } from 'src/MongoDB/Model/MongoDB.HHDFS76200200';
-import { APIService } from 'src/KIS/KIS.API.service'; // Adjust the path to your APIService file
+import { KISApiService } from 'src/KIS/KIS.API.service'; // Adjust the path to your KISApiService file
 
 export const LoopCallback = new Set([
   async (recv) => {
@@ -25,11 +25,15 @@ export const LoopCallback = new Set([
 ]);
 
 @Injectable()
-export class LoopService {
-  constructor(private readonly apiService: APIService) {
-    this.init().then((e) => {
-      console.log('KIS.refreshLoop inited');
-    });
+export class KISLoopService {
+  constructor(private readonly apiService: KISApiService) {
+    this.init()
+      .then((e) => {
+        console.log('KIS.refreshLoop inited');
+      })
+      .catch((e) => {
+        console.log('KISLoopService : ' + e);
+      });
   }
 
   async init() {
@@ -58,6 +62,5 @@ export class LoopService {
     for (const { excd, symb } of ItemList) {
       Loop(excd, symb);
     }
-    //   console.log(temp);
   }
 }

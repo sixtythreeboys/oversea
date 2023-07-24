@@ -116,7 +116,7 @@ for (const key of Object.keys(APICallers).filter(
 }
 
 @Injectable()
-export class APIService {
+export class KISApiService {
   async oauth2Approval() {
     return APICallers.oauth2Approval();
   }

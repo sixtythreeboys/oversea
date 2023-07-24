@@ -9,10 +9,10 @@ const schema = new mongoose.Schema({
   prdyCtrt: { type: Number, default: null },
   totalCtrt: { type: Number, default: null },
   htsKorIsnm: { type: String, default: null },
-  xymd: { type: String, required: true },
   cdate: { type: Date, default: null },
 });
 
-schema.index({ excd: 1, symb: 1, xymd: 1 }, { unique: true });
+schema.index({ excd: 1, symb: 1, cdate: 1 }, { unique: true });
+schema.index({ continuous: 1 });
 
-export default mongoose.model('ContinuousInfo', schema);
+export const CONTINUOUS_INFO = mongoose.model('CONTINUOUS_INFO', schema);

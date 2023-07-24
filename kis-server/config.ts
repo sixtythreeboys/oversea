@@ -49,4 +49,7 @@ export default {
     connectString:
       'mongodb+srv://oversea:oversea@63stockoversea.hgudvi2.mongodb.net/?retryWrites=true&w=majority',
   },
+  Batch: {
+    BufferSize: 100,
+  },
 };

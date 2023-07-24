@@ -1,12 +1,12 @@
 import { Body, Controller, Get, Query, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
-import { APIService } from 'src/KIS/KIS.API.service';
+import { KISApiService } from 'src/KIS/KIS.API.service';
 import { HHDFS76240000 } from 'src/KIS/KIS.type';
 import CONFIG from 'config';
 
 @Controller('api')
 export class APIController {
-  constructor(private readonly apiService: APIService) {}
+  constructor(private readonly apiService: KISApiService) {}
 
   @Get('test')
   async test(@Res() res: Response, @Query() params: any) {

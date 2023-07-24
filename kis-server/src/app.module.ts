@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { APIController } from 'src/APIserver/APIserver.controller';
-import { APIserverGateway } from 'src/APIserver/APIserver.gateway';
-import { APIService } from './KIS/KIS.API.service';
-import { LoopService } from './KIS/KIS.refreshLoop.service';
+import { APIserverModule } from './APIserver/APIserver.module';
+import { BatchModule } from './Batch/Batch.module';
+import { KISLoopService } from './KIS/KIS.refreshLoop.service';
+import { KISModule } from './KIS/KIS.module';
 
 @Module({
-  imports: [],
-  controllers: [APIController],
-  providers: [APIserverGateway, APIService, LoopService],
+  imports: [APIserverModule, BatchModule],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
