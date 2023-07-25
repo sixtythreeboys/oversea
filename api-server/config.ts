@@ -17,7 +17,7 @@ export default {
       statusPageUrl:
         'http://ec2-3-136-15-208.us-east-2.compute.amazonaws.com:8082/test',
       port: {
-        $: 8082,
+        $: 8080,
         '@enabled': true,
       },
       vipAddress: 'oversea',
