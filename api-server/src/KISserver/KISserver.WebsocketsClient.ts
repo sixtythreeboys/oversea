@@ -16,7 +16,7 @@ export class WebsocketsClient {
 
   private initListeners(): void {
     this.socket.on('getChanged', (data) => {
-      console.log('Received message from server:', data);
+      //console.log('Received message from server:', data);
     });
     const reconnect = this.reconnect;
     this.socket.on('disconnected', () => {

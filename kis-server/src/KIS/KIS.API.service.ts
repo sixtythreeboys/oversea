@@ -50,7 +50,6 @@ const APICallers = {
     } else if (output.tomv === '') {
       throw {
         status: 500,
-        params,
         data: { rt_cd, msg1: '유효하지않은 종목코드' },
       };
     }

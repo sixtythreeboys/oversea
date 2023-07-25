@@ -26,6 +26,7 @@ export const LoopCallback = new Set([
 
 @Injectable()
 export class KISLoopService {
+  onDoing: boolean;
   constructor(private readonly apiService: KISApiService) {
     this.init()
       .then((e) => {
@@ -34,9 +35,11 @@ export class KISLoopService {
       .catch((e) => {
         console.log('KISLoopService : ' + e);
       });
+    this.onDoing = true;
   }
 
   async init() {
+    if (this.onDoing) return;
     const ItemList = await ITEM_MAST.find().then((e) =>
       e.map(({ excd, symb }: any) => {
         return { excd, symb };

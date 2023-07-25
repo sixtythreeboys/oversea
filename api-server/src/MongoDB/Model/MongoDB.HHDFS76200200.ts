@@ -6,42 +6,42 @@ const schema = new mongoose.Schema(
     zdiv: String,
     curr: String,
     vnit: String,
-    open: String,
-    high: String,
-    low: String,
-    last: String,
-    base: String,
-    pvol: String,
-    pamt: String,
-    uplp: String,
-    dnlp: String,
-    h52p: String,
+    open: Number, // Convert to Number
+    high: Number, // Convert to Number
+    low: Number, // Convert to Number
+    last: Number, // Convert to Number
+    base: Number, // Convert to Number
+    pvol: Number, // Convert to Number
+    pamt: Number, // Convert to Number
+    uplp: Number, // Convert to Number
+    dnlp: Number, // Convert to Number
+    h52p: Number, // Convert to Number
     h52d: String,
-    l52p: String,
+    l52p: Number, // Convert to Number
     l52d: String,
-    perx: String,
-    pbrx: String,
-    epsx: String,
-    bpsx: String,
-    shar: String,
-    mcap: String,
-    tomv: String,
-    t_xprc: String,
-    t_xdif: String,
-    t_xrat: String,
-    p_xprc: String,
-    p_xdif: String,
-    p_xrat: String,
-    t_rate: String,
-    p_rate: String,
+    perx: Number, // Convert to Number
+    pbrx: Number, // Convert to Number
+    epsx: Number, // Convert to Number
+    bpsx: Number, // Convert to Number
+    shar: Number, // Convert to Number
+    mcap: Number, // Convert to Number
+    tomv: Number, // Convert to Number
+    t_xprc: Number, // Convert to Number
+    t_xdif: Number, // Convert to Number
+    t_xrat: Number, // Convert to Number
+    p_xprc: Number, // Convert to Number
+    p_xdif: Number, // Convert to Number
+    p_xrat: Number, // Convert to Number
+    t_rate: Number, // Convert to Number
+    p_rate: Number, // Convert to Number
     t_xsgn: String,
     p_xsng: String,
     e_ordyn: String,
-    e_hogau: String,
+    e_hogau: Number, // Convert to Number
     e_icod: String,
-    e_parp: String,
-    tvol: String,
-    tamt: String,
+    e_parp: Number, // Convert to Number
+    tvol: Number, // Convert to Number
+    tamt: Number, // Convert to Number
     etyp_nm: String,
     updatedTime: {
       type: Date,

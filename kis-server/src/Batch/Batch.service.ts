@@ -26,7 +26,9 @@ export class BatchService {
   async batchBundle() {
     if (this.onDoing) return;
     this.onDoing = true;
-    await this.batchUpdateContinuous.updateContinuous(new Date());
+    const BASEDATE = new Date();
+    await this.batchUpdateContinuous.updateContinuous(BASEDATE);
+    console.log(`batchBundle started ${new Date()}`);
     this.onDoing = false;
   }
 }

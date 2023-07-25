@@ -23,12 +23,12 @@ export class OverseaController {
   ) {
     try {
       const resData = await this.oversea.list({
-        period: period ?? 0,
-        avlsScal: avlsScal ?? 0,
+        period: period ? parseInt(period) : 0,
+        avlsScal: avlsScal ? parseInt(avlsScal) : 0,
       });
       res.status(200).send(resData);
     } catch (e) {
-      res.status(500).send(e);
+      res.status(500).send('err : ' + e);
     }
   }
 

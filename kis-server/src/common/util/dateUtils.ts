@@ -1,5 +1,5 @@
-export function getToday(): string {
-  const date = new Date();
+export function getDatestring(date?: Date): string {
+  date = date ? new Date() : date;
 
   const year = date.getFullYear().toString();
   const month = (date.getMonth() + 1).toString().padStart(2, '0');

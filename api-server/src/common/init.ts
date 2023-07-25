@@ -1,5 +1,5 @@
 import { appendFileSync } from 'fs';
-import { getToday } from './util/dateUtils';
+import { getDatestring } from './util/dateUtils';
 
 function logToFile() {
   console.log = new Proxy(console.log, {
@@ -8,7 +8,7 @@ function logToFile() {
         const logString = `${new Date()}
           ${argumentsList.map((arg) => JSON.stringify(arg, null, 2)).join(' ')}
           `;
-        appendFileSync('./log/' + getToday() + '.log', logString, 'utf8');
+        appendFileSync('./log/' + getDatestring() + '.log', logString, 'utf8');
       } catch (e) {}
       return target.apply(thisArg, argumentsList);
     },

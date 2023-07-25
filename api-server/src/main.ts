@@ -7,7 +7,7 @@ import { init as COMMON } from './common/init';
 import config from 'config';
 
 async function init() {
-  const initList = { MongoDB, COMMON }; //EUREKA
+  const initList = { MongoDB, COMMON, EUREKA };
   await Promise.all(
     Object.keys(initList).map(async (service) => {
       try {
