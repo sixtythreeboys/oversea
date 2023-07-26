@@ -28,10 +28,10 @@
 			socket.on("disconnect", function () {
 				console.log("Socket.IO connection closed!");
 			});
-			socket.on("HDFSCNT0", function (data) {
-				console.log("HDFSCNT0" + JSON.stringify(data, undefined, 2));
+			socket.on("subscribe", function (data) {
+				console.log("subscribe" + JSON.stringify(data, undefined, 2));
 			});
-			socket.emit("HDFSCNT0", {
+			socket.emit("subscribe", {
 				tr_key: "DNASAAPL",
 			});
 		</script>

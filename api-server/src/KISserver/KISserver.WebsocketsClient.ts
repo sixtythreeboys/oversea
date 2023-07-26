@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { io, Socket } from 'socket.io-client';
 import config from 'config';
+import { overseaModel } from 'src/oversea/oversea.model';
 
 @Injectable()
 export class WebsocketsClient {
@@ -16,7 +17,11 @@ export class WebsocketsClient {
 
   private initListeners(): void {
     this.socket.on('getChanged', (data) => {
-      //console.log('Received message from server:', data);
+      if (!data.rsym) return;
+      const clients = overseaModel.wsClients.rsyms.get(data.rsym) ?? new Set();
+      for (const client of clients) {
+        client.emit('message', { data });
+      }
     });
     const reconnect = this.reconnect;
     this.socket.on('disconnected', () => {
