@@ -56,7 +56,7 @@ export class KISLoopService {
           callback(recv);
         }
       } catch (err) {
-        console.log(err);
+        //console.log(err);
       } finally {
         Loop(excd, symb);
       }
