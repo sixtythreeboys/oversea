@@ -21,14 +21,20 @@ export class OverseaService {
         ? { tomv: { $lt: Math.abs(avlsScal) } }
         : {},
     );
-    const HHDFS76200200_Map = Object.fromEntries(
-      HHDFS76200200_Data.map((e) => [e.rsym, e]),
-    );
     let results = [];
-    for (const data of continuous_Data) {
-      const key = `D${data.excd}${data.symb}`;
-      if (HHDFS76200200_Map[key] !== undefined) {
-        results.push([HHDFS76200200_Map[key].tomv, data]);
+    if (period === 0) {
+      for (const data of HHDFS76200200_Data) {
+        results.push([data.tomv, data]);
+      }
+    } else {
+      const HHDFS76200200_Map = Object.fromEntries(
+        HHDFS76200200_Data.map((e) => [e.rsym, e]),
+      );
+      for (const data of continuous_Data) {
+        const key = `D${data.excd}${data.symb}`;
+        if (HHDFS76200200_Map[key] !== undefined) {
+          results.push([HHDFS76200200_Map[key].tomv, data]);
+        }
       }
     }
     results.sort((a, b) => b[0] - a[0]);
