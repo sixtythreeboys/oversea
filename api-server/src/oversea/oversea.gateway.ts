@@ -35,7 +35,10 @@ export class OverseaGateway
   }
   @SubscribeMessage('subscribe')
   //@SubscribeMessage('message')
-  async subscribe(client: WebSocket, rsym: string) {
+  async subscribe(
+    @ConnectedSocket() client: WebSocket,
+    @MessageBody('rsym') rsym: any,
+  ) {
     const isExist = await HHDFS76200200.exists({ rsym });
     if (isExist) {
       overseaModel.wsClients.add(client, rsym);
