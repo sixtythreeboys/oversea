@@ -19,7 +19,7 @@ export const LoopCallback = new Set([
       );
       //console.log(result);
     } catch (error) {
-      console.log('Error occurred:', error);
+      //console.log('Error occurred:', error);
     }
   },
 ]);
