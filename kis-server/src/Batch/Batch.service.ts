@@ -17,10 +17,12 @@ export class BatchService {
   async moduleInit() {
     await updateToken();
 
-    this.job = new CronJob('0 0 2 * * *', this.batchBundle());
+    this.job = new CronJob('0 0 2 * * *', () => {
+      this.batchBundle();
+    });
     this.job.start();
 
-    await this.batchBundle();
+    //await this.batchBundle();
   }
 
   async batchBundle() {
