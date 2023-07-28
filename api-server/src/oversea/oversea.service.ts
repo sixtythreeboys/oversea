@@ -25,38 +25,61 @@ export class OverseaService {
     const HHDFS76200200_Map = Object.fromEntries(
       HHDFS76200200_Data.map((e) => [e.rsym, e]),
     );
-    let results = [];
-    for (const data of continuous_Data) {
-      const key = `D${data.excd}${data.symb}`;
-      if (HHDFS76200200_Map[key] !== undefined) {
-        results.push([HHDFS76200200_Map[key].tomv, data]);
+    if (period === 0) {
+      let results = [];
+      for (const data of HHDFS76200200_Data) {
+        const [excd, symb] = [
+          data.rsym.substring(1, 4),
+          data.rsym.substring(4),
+        ];
+        const htsKorIsnm = await ITEM_MAST.findOne({ excd, symb })
+          .then((e) => e.knam)
+          .catch((e) => null);
+        results.push({
+          tomv: data.tomv,
+          excd: excd,
+          mkscShrnIscd: symb,
+          htsKorIsnm: htsKorIsnm,
+          stckClpr: data.base,
+          prdyAvlsScal: '-',
+          prdyCtrt: 0,
+          totalCtrt: 0,
+        });
       }
-    }
-    results.sort((a, b) => b[0] - a[0]);
-    results = results
-      .map(([tomv, data]: any) => {
-        try {
-          let totalCtrt = 0;
-          for (let i = 0; i < Math.abs(period); i++) {
-            totalCtrt = data.datas[i].rate;
-          }
-          return {
-            tomv: tomv,
-            excd: data.excd,
-            mkscShrnIscd: data.symb,
-            htsKorIsnm: data.htsKorIsnm,
-            stckClpr: data.datas[0].clos,
-            prdyAvlsScal: '-',
-            prdyCtrt: data.datas[0].rate,
-            totalCtrt: totalCtrt,
-          };
-        } catch (e) {
-          //console.log(e);
-          return null;
+    } else {
+      let results = [];
+      for (const data of continuous_Data) {
+        const key = `D${data.excd}${data.symb}`;
+        if (HHDFS76200200_Map[key] !== undefined) {
+          results.push([HHDFS76200200_Map[key], data]);
         }
-      })
-      .filter((e) => e);
-    return results;
+      }
+      results.sort((a, b) => b[0] - a[0]);
+      results = results
+        .map(([data, conti]: any) => {
+          try {
+            let totalCtrt = 0;
+            for (let i = 0; i < Math.abs(period); i++) {
+              totalCtrt = conti.datas[i].rate;
+            }
+            return {
+              tomv: data.tomv,
+              excd: conti.excd,
+              mkscShrnIscd: conti.symb,
+              htsKorIsnm: conti.htsKorIsnm,
+              stckClpr: data.base,
+              prdyAvlsScal: '-',
+              prdyCtrt: conti.datas[0].rate,
+              totalCtrt: totalCtrt,
+            };
+          } catch (e) {
+            //console.log(e);
+            return null;
+          }
+        })
+        .filter((e) => e);
+      return results;
+    }
   }
 
   async getDetail({ EXCD, 종목코드, 기간분류코드, period }) {
