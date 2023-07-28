@@ -8,6 +8,7 @@ import { ITEM_MAST } from 'src/MongoDB/Model/MongoDB.ITEM_MAST';
 export class OverseaService {
   constructor(private readonly apiService: ApiService) {}
   async list({ period, avlsScal }) {
+    let results = [];
     const continuous_Data = await CONTINUOUS_INFO.find(
       period > 0
         ? { continuous: { $gt: period } }
@@ -26,7 +27,6 @@ export class OverseaService {
       HHDFS76200200_Data.map((e) => [e.rsym, e]),
     );
     if (period === 0) {
-      let results = [];
       for (const data of HHDFS76200200_Data) {
         const [excd, symb] = [
           data.rsym.substring(1, 4),
@@ -47,14 +47,12 @@ export class OverseaService {
         });
       }
     } else {
-      let results = [];
       for (const data of continuous_Data) {
         const key = `D${data.excd}${data.symb}`;
         if (HHDFS76200200_Map[key] !== undefined) {
           results.push([HHDFS76200200_Map[key], data]);
         }
       }
-      results.sort((a, b) => b[0] - a[0]);
       results = results
         .map(([data, conti]: any) => {
           try {
@@ -78,8 +76,9 @@ export class OverseaService {
           }
         })
         .filter((e) => e);
-      return results;
     }
+    results.sort((a, b) => b.tomv - a.tomv);
+    return results;
   }
 
   async getDetail({ EXCD, 종목코드, 기간분류코드, period }) {
