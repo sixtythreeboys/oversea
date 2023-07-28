@@ -9,13 +9,6 @@ export class OverseaService {
   constructor(private readonly apiService: ApiService) {}
   async list({ period, avlsScal }) {
     let results = [];
-    const continuous_Data = await CONTINUOUS_INFO.find(
-      period > 0
-        ? { continuous: { $gt: period } }
-        : period < 0
-        ? { continuous: { $lt: period } }
-        : {},
-    );
     const HHDFS76200200_Data = await HHDFS76200200.find(
       avlsScal > 0
         ? { tomv: { $gt: Math.abs(avlsScal) } }
@@ -27,14 +20,17 @@ export class OverseaService {
       HHDFS76200200_Data.map((e) => [e.rsym, e]),
     );
     if (period === 0) {
+      const ITEM_LIST = await ITEM_MAST.find().then((dataList) =>
+        Object.fromEntries(
+          dataList.map((e) => [`D${e.excd}${e.symb}`, e.knam]),
+        ),
+      );
       for (const data of HHDFS76200200_Data) {
         const [excd, symb] = [
           data.rsym.substring(1, 4),
           data.rsym.substring(4),
         ];
-        const htsKorIsnm = await ITEM_MAST.findOne({ excd, symb })
-          .then((e) => e.knam)
-          .catch((e) => null);
+        const htsKorIsnm = ITEM_LIST[data.rsym];
         results.push({
           tomv: data.tomv,
           excd: excd,
@@ -47,6 +43,13 @@ export class OverseaService {
         });
       }
     } else {
+      const continuous_Data = await CONTINUOUS_INFO.find(
+        period > 0
+          ? { continuous: { $gt: period } }
+          : period < 0
+          ? { continuous: { $lt: period } }
+          : {},
+      );
       for (const data of continuous_Data) {
         const key = `D${data.excd}${data.symb}`;
         if (HHDFS76200200_Map[key] !== undefined) {
