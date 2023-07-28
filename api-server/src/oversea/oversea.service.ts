@@ -51,7 +51,7 @@ export class OverseaService {
             totalCtrt: totalCtrt,
           };
         } catch (e) {
-          console.log(e);
+          //console.log(e);
           return null;
         }
       })

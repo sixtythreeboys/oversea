@@ -30,12 +30,12 @@ export class APIserverGateway
     KISModel.apiServerWsClient.emit('getChanged', recv.data);
   }
   handleConnection(client: WebSocket, ...args: any[]) {
-    console.log('Client connected' + client);
+    //console.log('Client connected' + client);
     KISModel.apiServerWsClient = client;
     LoopCallback.add(this.getChangedCallback);
   }
   handleDisconnect(client: WebSocket) {
-    console.log('Client disconnected' + client);
+    //console.log('Client disconnected' + client);
     KISModel.apiServerWsClient = null;
     LoopCallback.delete(this.getChangedCallback);
   }

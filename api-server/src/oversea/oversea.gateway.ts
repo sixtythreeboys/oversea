@@ -27,11 +27,11 @@ export class OverseaGateway
     console.log('oversea WS inited');
   }
   handleConnection(client: WebSocket, ...args: any[]) {
-    console.log('Client connected' + client);
+    //console.log('Client connected' + client);
   }
   handleDisconnect(client: WebSocket) {
     overseaModel.wsClients.delete(client);
-    console.log('Client disconnected' + client);
+    //console.log('Client disconnected' + client);
   }
   @SubscribeMessage('subscribe')
   //@SubscribeMessage('message')

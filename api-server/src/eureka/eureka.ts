@@ -6,7 +6,7 @@ export function apply() {
   try {
     client.start();
   } catch (e) {
-    //console.log(e);
+    console.log(e);
   }
   process.on('SIGINT', () => {
     client.stop(() => {

@@ -24,17 +24,21 @@ export class BatchUpdateContinuous {
         }
         if (Object.values(data).includes(Number.NaN)) return [null, null];
 
+        res.push(data);
         if (dir === -1 && data.rate > 0) {
           break;
         } else if (dir === 1 && data.rate < 0) {
           break;
         }
-        res.push(data);
         if (dir === 0 && data.rate !== 0) {
           dir = data.rate > 0 ? 1 : -1;
         }
       }
-      return [dir, res];
+      let last = 0;
+      for (const idx in res) {
+        if (res[idx].rate * dir > 0) last = parseInt(idx);
+      }
+      return [dir, res.slice(0, last + 1)];
     }
     let DataList = null;
     let dir = 0;
@@ -54,7 +58,7 @@ export class BatchUpdateContinuous {
           buffer,
         )
         .catch((e) => {
-          console.log(e);
+          //console.log(e);
           return null;
         });
       if (DataList === null) return;
@@ -93,7 +97,7 @@ export class BatchUpdateContinuous {
       try {
         this.makeNew({ excd, symb });
       } catch (e) {
-        console.log(e);
+        //console.log(e);
       }
     }
   }

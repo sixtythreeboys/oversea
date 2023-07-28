@@ -8,11 +8,8 @@ export class BatchService {
   onDoing: boolean;
   constructor(private readonly batchUpdateContinuous: BatchUpdateContinuous) {
     this.onDoing = false;
-    try {
-      this.moduleInit();
-    } catch (e) {
-      console.log(e);
-    }
+
+    this.moduleInit();
   }
   async moduleInit() {
     await updateToken();
@@ -22,7 +19,7 @@ export class BatchService {
     });
     this.job.start();
 
-    //await this.batchBundle();
+    await this.batchBundle();
   }
 
   async batchBundle() {

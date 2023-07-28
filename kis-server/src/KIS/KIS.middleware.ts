@@ -19,7 +19,7 @@ export async function updateToken() {
 
   kisModel.token = res.data;
 
-  console.log('token updated : ' + JSON.stringify(kisModel.token));
+  //console.log('token updated : ' + JSON.stringify(kisModel.token));
 }
 
 export async function checkTokenMiddleware() {
