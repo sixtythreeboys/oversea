@@ -20,22 +20,16 @@ export class OverseaService {
       HHDFS76200200_Data.map((e) => [e.rsym, e]),
     );
     if (period === 0) {
-      const ITEM_LIST = await ITEM_MAST.find().then((dataList) =>
-        Object.fromEntries(
-          dataList.map((e) => [`D${e.excd}${e.symb}`, e.knam]),
-        ),
-      );
       for (const data of HHDFS76200200_Data) {
         const [excd, symb] = [
           data.rsym.substring(1, 4),
           data.rsym.substring(4),
         ];
-        const htsKorIsnm = ITEM_LIST[data.rsym];
         results.push({
           tomv: data.tomv,
           excd: excd,
           mkscShrnIscd: symb,
-          htsKorIsnm: htsKorIsnm,
+          htsKorIsnm: data.knam,
           stckClpr: data.base,
           prdyAvlsScal: '-',
           prdyCtrt: 0,

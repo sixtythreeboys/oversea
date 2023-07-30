@@ -43,6 +43,7 @@ const schema = new mongoose.Schema(
     tvol: Number, // Convert to Number
     tamt: Number, // Convert to Number
     etyp_nm: String,
+    knam: String,
     updatedTime: {
       type: Date,
       default: new Date(),

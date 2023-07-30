@@ -19,7 +19,7 @@ export class BatchService {
     });
     this.job.start();
 
-    //await this.batchBundle();
+    await this.batchBundle();
   }
 
   async batchBundle() {
