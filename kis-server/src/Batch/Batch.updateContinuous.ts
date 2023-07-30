@@ -4,6 +4,7 @@ import { ITEM_MAST } from 'src/MongoDB/Model/MongoDB.ITEM_MAST';
 import { KISApiService } from 'src/KIS/KIS.API.service';
 import config from 'config';
 import { getDatestring } from 'src/common/util/dateUtils';
+import KISModel from 'src/KIS/KIS.model';
 
 @Injectable()
 export class BatchUpdateContinuous {
@@ -66,9 +67,8 @@ export class BatchUpdateContinuous {
       if (DataList === null) return;
       if (DataList.length < buffer) break;
     }
-    const htsKorIsnm = await ITEM_MAST.findOne({ excd, symb })
-      .then((e) => e.knam)
-      .catch((e) => null);
+    const htsKorIsnm = KISModel.knamMap[`D${excd}${symb}`];
+
     const insertData = new CONTINUOUS_INFO({
       excd: excd,
       symb: symb,

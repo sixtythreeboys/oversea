@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { ITEM_MAST } from 'src/MongoDB/Model/MongoDB.ITEM_MAST';
 import { HHDFS76200200 } from 'src/MongoDB/Model/MongoDB.HHDFS76200200';
 import { KISApiService } from 'src/KIS/KIS.API.service'; // Adjust the path to your KISApiService file
+import KISModel from './KIS.model';
 
 export const LoopCallback = new Set([
   async (recv) => {
     recv = recv.data;
-    recv.updatedTime = new Date();
     if (!recv.rsym) return;
+    recv.updatedTime = new Date();
+    recv.knam = KISModel.knamMap[recv.rsym];
     try {
       const filter = { rsym: recv.rsym }; // Properties to check for duplication
       const update = recv;
