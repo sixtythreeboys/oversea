@@ -39,7 +39,6 @@ export class OverseaGateway
     @ConnectedSocket() client: WebSocket,
     @MessageBody('rsym') rsym: any,
   ) {
-    console.log('test');
     const isExist = await HHDFS76200200.exists({ rsym });
     if (isExist) {
       overseaModel.wsClients.add(client, rsym);
