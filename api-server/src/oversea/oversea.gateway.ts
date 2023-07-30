@@ -33,12 +33,13 @@ export class OverseaGateway
     overseaModel.wsClients.delete(client);
     //console.log('Client disconnected' + client);
   }
-  @SubscribeMessage('subscribe')
   //@SubscribeMessage('message')
+  @SubscribeMessage('subscribe')
   async subscribe(
     @ConnectedSocket() client: WebSocket,
     @MessageBody('rsym') rsym: any,
   ) {
+    console.log('test');
     const isExist = await HHDFS76200200.exists({ rsym });
     if (isExist) {
       overseaModel.wsClients.add(client, rsym);
