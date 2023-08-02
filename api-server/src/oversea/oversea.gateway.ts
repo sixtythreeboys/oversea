@@ -42,19 +42,23 @@ export class OverseaGateway
     @ConnectedSocket() client: WebSocket,
     @MessageBody('rsym') rsym: any,
   ) {
-    let data = null;
     const isExist = await HHDFS76200200.exists({ rsym });
     if (isExist) {
       overseaModel.wsClients.add(client, rsym);
-      data = { msg: '종목 구독 완료' };
+      client.send(
+        JSON.stringify({ event: 'message', data: { msg: '종목 구독 완료' } }),
+      );
     } else {
-      data = { msg: '해당 종목 없음' };
+      client.send(
+        JSON.stringify({ event: 'message', data: { msg: '해당 종목 없음' } }),
+      );
     }
-    return { event: 'message', data };
   }
   @SubscribeMessage('unsubscribe')
   async unsubscribe(client: WebSocket) {
     overseaModel.wsClients.delete(client);
-    return { event: 'message', data: { msg: '종목 구독 해제' } };
+    client.send(
+      JSON.stringify({ event: 'message', data: { msg: '종목 구독 해제' } }),
+    );
   }
 }

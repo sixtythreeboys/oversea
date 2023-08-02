@@ -23,34 +23,30 @@ let OverseaGateway = class OverseaGateway {
         console.log('oversea WS inited');
     }
     handleConnection(client, ...args) {
-        console.log('Client connected' + client);
     }
     handleDisconnect(client) {
         try {
             oversea_model_1.overseaModel.wsClients.delete(client);
         }
         catch (e) { }
-        console.log('Client disconnected' + client);
     }
     onMessage(client, data) {
         console.log('message');
         console.log(data);
     }
     async subscribe(client, rsym) {
-        let data = null;
         const isExist = await MongoDB_HHDFS76200200_1.HHDFS76200200.exists({ rsym });
         if (isExist) {
             oversea_model_1.overseaModel.wsClients.add(client, rsym);
-            data = { msg: '종목 구독 완료' };
+            client.send(JSON.stringify({ event: 'message', data: { msg: '종목 구독 완료' } }));
         }
         else {
-            data = { msg: '해당 종목 없음' };
+            client.send(JSON.stringify({ event: 'message', data: { msg: '해당 종목 없음' } }));
         }
-        return { event: 'message', data };
     }
     async unsubscribe(client) {
         oversea_model_1.overseaModel.wsClients.delete(client);
-        return { event: 'message', data: { msg: '종목 구독 해제' } };
+        client.send(JSON.stringify({ event: 'message', data: { msg: '종목 구독 해제' } }));
     }
 };
 __decorate([
