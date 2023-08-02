@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { apply as EUREKA } from '../src/eureka/eureka';
 import { init as MongoDB } from 'src/MongoDB/MongoDB.service';
 import { init as COMMON } from './common/init';
+import { WsAdapter } from '@nestjs/platform-ws';
 //import { init as KISWS } from 'src/KIS/KISWS';
 import config from 'config';
 
@@ -26,6 +27,7 @@ async function init() {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+  app.useWebSocketAdapter(new WsAdapter(app));
   await init();
   await app.listen(config.APP.PORT);
 }

@@ -12,12 +12,7 @@ import { Server, WebSocket } from 'ws';
 import { overseaModel } from './oversea.model';
 import { HHDFS76200200 } from 'src/MongoDB/Model/MongoDB.HHDFS76200200';
 
-@WebSocketGateway({
-  cors: {
-    origin: '*',
-  },
-  namespace: 'oversea/socket',
-})
+@WebSocketGateway({ path: '/socket' })
 export class OverseaGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -27,12 +22,20 @@ export class OverseaGateway
     console.log('oversea WS inited');
   }
   handleConnection(client: WebSocket, ...args: any[]) {
-    //console.log('Client connected' + client);
+    console.log('Client connected' + client);
   }
   handleDisconnect(client: WebSocket) {
     overseaModel.wsClients.delete(client);
     //console.log('Client disconnected' + client);
   }
+
+  @SubscribeMessage('events')
+  onEvent(client: any, data: any) {
+    let { event, payload } = data;
+    console.log(data);
+    return data;
+  }
+
   //@SubscribeMessage('message')
   @SubscribeMessage('subscribe')
   async subscribe(
