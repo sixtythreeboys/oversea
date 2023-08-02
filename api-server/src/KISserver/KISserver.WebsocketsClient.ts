@@ -20,7 +20,7 @@ export class WebsocketsClient {
       if (!data.rsym) return;
       const clients = overseaModel.wsClients.rsyms.get(data.rsym) ?? new Set();
       for (const client of clients) {
-        client.send({ event: 'message', data });
+        client.send(JSON.stringify({ event: 'message', data }));
       }
     });
     const reconnect = this.reconnect;
