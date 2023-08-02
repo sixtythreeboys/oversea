@@ -12,7 +12,7 @@ import { Server, WebSocket } from 'ws';
 import { overseaModel } from './oversea.model';
 import { HHDFS76200200 } from 'src/MongoDB/Model/MongoDB.HHDFS76200200';
 
-@WebSocketGateway({ path: '/socket' })
+@WebSocketGateway({ path: 'oversea/socket' })
 export class OverseaGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -25,34 +25,36 @@ export class OverseaGateway
     //console.log('Client connected' + client);
   }
   handleDisconnect(client: WebSocket) {
-    overseaModel.wsClients.delete(client);
+    try {
+      overseaModel.wsClients.delete(client);
+    } catch (e) {}
     //console.log('Client disconnected' + client);
   }
 
-  @SubscribeMessage('events')
-  onEvent(client: any, data: any) {
-    let { event, payload } = data;
+  @SubscribeMessage('message')
+  onMessage(client: any, data: any) {
+    console.log('message');
     console.log(data);
-    return data;
   }
 
-  //@SubscribeMessage('message')
   @SubscribeMessage('subscribe')
   async subscribe(
     @ConnectedSocket() client: WebSocket,
     @MessageBody('rsym') rsym: any,
   ) {
+    let data = null;
     const isExist = await HHDFS76200200.exists({ rsym });
     if (isExist) {
       overseaModel.wsClients.add(client, rsym);
-      client.emit('message', { msg: '종목 구독 완료' });
+      data = { msg: '종목 구독 완료' };
     } else {
-      client.emit('message', { msg: '해당 종목 없음' });
+      data = { msg: '해당 종목 없음' };
     }
+    return { event: 'message', data };
   }
   @SubscribeMessage('unsubscribe')
   async unsubscribe(client: WebSocket) {
     overseaModel.wsClients.delete(client);
-    client.emit('message', { msg: '종목 구독 해제' });
+    return { event: 'message', data: { msg: '종목 구독 해제' } };
   }
 }
